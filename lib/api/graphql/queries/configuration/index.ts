@@ -1,0 +1,52 @@
+import { gql } from '@apollo/client';
+
+export const GET_CONFIGURATION = gql`
+  query getConfiguration {
+    configuration {
+      _id
+      email
+      emailName
+      password
+      enableEmail
+      clientId
+      clientSecret
+      sandbox
+      publishableKey
+      secretKey
+      currency
+      currencySymbol
+      deliveryRate
+      skipWhatsAppOTP
+      formEmail
+      sendGridApiKey
+      sendGridEnabled
+      sendGridEmail
+      sendGridEmailName
+      sendGridPassword
+      googleApiKey
+      cloudinaryUploadUrl
+      cloudinaryApiKey
+      webClientID
+      androidClientID
+      iOSClientID
+      expoClientID
+      googleMapLibraries
+      googleColor
+      termsAndConditions
+      privacyPolicy
+      testOtp
+      firebaseKey
+      authDomain
+      projectId
+      storageBucket
+      msgSenderId
+      appId
+      measurementId
+      isPaidVersion
+      skipEmailVerification
+      skipMobileVerification
+      costType
+      vapidKey
+    }
+  }
+`;

@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: tifto-admin
+    env: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: NEXT_PUBLIC_SERVER_URL
+        value: https://ftifto-backend.onrender.com
+      - key: NEXT_PUBLIC_WS_SERVER_URL
+        value: wss://ftifto-backend.onrender.com
+
