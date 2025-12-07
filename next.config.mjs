@@ -88,20 +88,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-          {
-            key: 'Content-Type',
-            value: 'text/javascript; charset=utf-8',
-          },
-        ],
-      },
-      {
-        source: '/_next/static/css/:path*.css',
+        source: '/_next/static/css/:path*',
         headers: [
           {
             key: 'Content-Type',
@@ -114,12 +101,30 @@ const nextConfig = {
         ],
       },
       {
-        source: '/_next/static/chunks/:path*.js',
+        source: '/_next/static/chunks/:path*',
         headers: [
           {
             key: 'Content-Type',
-            value: 'text/javascript; charset=utf-8',
+            value: 'application/javascript; charset=utf-8',
           },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/media/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
