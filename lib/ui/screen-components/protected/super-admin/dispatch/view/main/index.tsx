@@ -70,15 +70,17 @@ export default function DispatchMain() {
     fetchPolicy: 'network-only',
   });
 
-  // 🔥 SUBSCRIPTION (will attempt to use, but has fallback)
+  // 🔥 SUBSCRIPTION (disabled - subscriptionDispatcher doesn't exist in schema)
+  // Using polling instead for real-time updates
   const { data: subscriptionData } = useSubscription(
-    SUBSCRIPTION_DISPATCH_ORDER,
+    SUBSCRIPTION_DISPATCH_ORDER as any,
     {
+      skip: true, // Skip subscription since it doesn't exist
       onError: (error) => {
         console.error('❌ Subscription error:', error);
         console.log('⚠️ Falling back to polling...');
       },
-      shouldResubscribe: true,
+      shouldResubscribe: false,
     }
   );
 

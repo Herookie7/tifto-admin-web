@@ -43,7 +43,7 @@ export default function GrowthOverView() {
       usersCount: data?.getDashboardUsersByYear?.usersCount ?? [],
       vendorsCount: data?.getDashboardUsersByYear?.vendorsCount ?? [],
       restaurantsCount: data?.getDashboardUsersByYear?.restaurantsCount ?? [],
-      ridersCount: data?.getDashboardUsersByYear?.ridersCount ?? 0,
+      ridersCount: data?.getDashboardUsersByYear?.ridersCount ?? [],
     };
   }, [data]);
 

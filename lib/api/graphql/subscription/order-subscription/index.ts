@@ -82,52 +82,10 @@ export const SUBSCRIPTION_PLACE_ORDER = gql`
   }
 `;
 
-export const SUBSCRIPTION_DISPATCH_ORDER = gql`
-  subscription SubscriptionDispatcher {
-    subscriptionDispatcher {
-      _id
-      zone {
-        _id
-      }
-      orderId
-      restaurant {
-        _id
-        name
-        image
-        address
-        location {
-          coordinates
-        }
-      }
-      deliveryAddress {
-        location {
-          coordinates
-        }
-        deliveryAddress
-      }
-      user {
-        name
-        phone
-      }
-      paymentMethod
-      orderStatus
-      preparationTime
-      expectedTime
-      acceptedAt
-      selectedPrepTime
-      isPickedUp
-      status
-      isActive
-      createdAt
-      rider {
-        _id
-        name
-        username
-        available
-      }
-    }
-  }
-`;
+// Note: subscriptionDispatcher does not exist in the GraphQL schema
+// Use subscriptionOrder or subscribePlaceOrder instead
+// This subscription has been removed to fix GraphQL errors
+export const SUBSCRIPTION_DISPATCH_ORDER = null;
 
 export const SUBSCRIPTION_ORDER = gql`
   subscription SubscriptionOrder($id: String!) {

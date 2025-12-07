@@ -69,13 +69,13 @@ export const useConfiguration = () => {
   const envServerRest =
     process.env.NEXT_PUBLIC_SERVER_REST_URL ??
     process.env.SERVER_REST_URL ??
-    'https://ftifto-backend.onrender.com';
+    'https://tifto-backend.onrender.com';
 
   const envSocket =
     process.env.NEXT_PUBLIC_WS_SERVER_URL ??
     process.env.NEXT_PUBLIC_SOCKET_URL ??
     process.env.SOCKET_URL ??
-    'wss://ftifto-backend.onrender.com';
+    'wss://tifto-backend.onrender.com';
 
   const SERVER_URL =
     process.env.NEXT_PUBLIC_SERVER_URL ?? deriveHttpOrigin(envServerRest);
