@@ -13,7 +13,7 @@
     "start": "next start",
     "lint": "next lint",
     "prettier": "prettier --write .",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "cy:open": "cypress open",
     "cy:run": "cypress run"
   },
