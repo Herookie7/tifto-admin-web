@@ -1,6 +1,6 @@
 'use client';
 // Screens
-import AdminRestaurantDashboard from '@/lib/ui/screens/admin/restaurant/dashboard';
+import AdminRestaurantDashboard from '@/lib/ui/screens/admin/restaurant/dashboard/index';
 
 export default function DashboardPage() {
   return <AdminRestaurantDashboard />
