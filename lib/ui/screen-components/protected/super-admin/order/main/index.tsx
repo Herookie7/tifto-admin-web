@@ -51,8 +51,7 @@ export default function OrderSuperAdminMain() {
     GET_ORDERS_WITHOUT_PAGINATION,
     {
       filters: {
-        search: dateFilter?.search,
-        status: dateFilter?.status,
+        search: searchTerm || undefined,
         starting_date: dateFilter?.startDate,
         ending_date: dateFilter?.endDate,
       },
