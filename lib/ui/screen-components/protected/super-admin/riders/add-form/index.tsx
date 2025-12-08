@@ -278,7 +278,7 @@ export default function RiderAddForm({
                         <CustomPhoneTextField
                           type="text"
                           mask="999-999-9999"
-                          placeholder={t('Phone Number')}
+                          placeholder={t('PhoneNumber')}
                           name="phone"
                           showLabel={true}
                           value={values?.phone?.toString()}
