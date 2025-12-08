@@ -22,8 +22,19 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
 
   const cache = new InMemoryCache();
 
+  // Ensure GraphQL URL is correctly formatted (no double slashes)
+  const graphqlUrl = `${SERVER_URL.replace(/\/$/, '')}/graphql`;
+  // Ensure WebSocket URL is correctly formatted
+  const wsGraphqlUrl = `${WS_SERVER_URL.replace(/\/$/, '')}/graphql`;
+  
+  // Debug: Log the URLs being used (remove in production if needed)
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    console.log('🔗 GraphQL URL:', graphqlUrl);
+    console.log('🔗 WebSocket URL:', wsGraphqlUrl);
+  }
+  
   const httpLink = createHttpLink({
-    uri: `${SERVER_URL}graphql`,
+    uri: graphqlUrl,
     fetchOptions: {
       mode: 'cors',
       credentials: 'omit',
@@ -34,7 +45,7 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   });
 
   // WebSocketLink with error handling
-  const subscriptionClient = new SubscriptionClient(`${WS_SERVER_URL}graphql`, {
+  const subscriptionClient = new SubscriptionClient(wsGraphqlUrl, {
     reconnect: true,
     timeout: 30000,
     lazy: true,
@@ -69,11 +80,24 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   const wsLink = new WebSocketLink(subscriptionClient);
 
   // Error Handling Link using ApolloLink's onError (for network errors)
-  const errorLink = onError(({ networkError, graphQLErrors }) => {
+  const errorLink = onError(({ networkError, graphQLErrors, operation }) => {
     if (networkError) {
       // Handle CORS errors more gracefully
       if ('statusCode' in networkError || (networkError.message && networkError.message.includes('CORS'))) {
-        console.warn('CORS or network error detected. This may be a backend configuration issue.');
+        console.error(
+          'CORS or network error detected.',
+          '\nRequest URL:', operation.getContext().uri || graphqlUrl,
+          '\nThis may be a backend CORS configuration issue.',
+          '\nPlease ensure the backend allows requests from this origin.'
+        );
+      } else if (networkError.message && networkError.message.includes('Failed to fetch')) {
+        console.error(
+          'Network request failed. Possible causes:',
+          '\n- Backend server is down or unreachable',
+          '\n- CORS configuration issue',
+          '\n- Network connectivity problem',
+          '\nRequest URL:', operation.getContext().uri || graphqlUrl
+        );
       } else {
         console.error('Network Error:', networkError);
       }
