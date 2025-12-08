@@ -5,6 +5,7 @@ import { INumberTextFieldProps } from '@/lib/utils/interfaces';
 
 // Hooks
 import { useFormikContext } from 'formik';
+import { useConfiguration } from '@/lib/hooks/useConfiguration';
 
 // Components
 import { InputNumber } from 'primereact/inputnumber';
@@ -24,6 +25,9 @@ export default function CustomNumberTextField({
 }: INumberTextFieldProps) {
   // Formik
   const { setFieldValue } = useFormikContext();
+  // Configuration
+  const { CURRENCY_SYMBOL } = useConfiguration();
+  const currencyPrefix = CURRENCY_SYMBOL ? `${CURRENCY_SYMBOL} ` : '₹ ';
 
   const MIN_VALUE = 1;
   const MAX_VALUE = 100;
@@ -61,7 +65,7 @@ export default function CustomNumberTextField({
           className={`${classes.inputNumber} z-0 h-11 w-full border border-inherit bg-white px-10 text-center focus:shadow-none focus:outline-none ${className}`}
           name={name}
           value={value}
-          prefix="$ "
+          prefix={currencyPrefix}
           useGrouping={false}
           onChange={(e: { value: number | null }) => {
             setFieldValue(name, e.value);
