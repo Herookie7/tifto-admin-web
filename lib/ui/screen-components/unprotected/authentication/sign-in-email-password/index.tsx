@@ -108,7 +108,14 @@ export default function LoginEmailPasswordMain() {
   // Handler
   const onSubmitHandler = async (data: ISignInForm) => {
     try {
-      await maybeSignInWithFirebase(data.email, data.password);
+      // Try Firebase sign-in, but don't block login if it fails
+      // Firebase auth is optional and used for token-based auth
+      maybeSignInWithFirebase(data.email, data.password).catch(() => {
+        // Silently fail - Firebase auth failure shouldn't block GraphQL login
+        // This is expected if user doesn't exist in Firebase Auth
+      });
+      
+      // Proceed with GraphQL login regardless of Firebase result
       await onLogin({
         variables: {
           ...data,
@@ -230,7 +237,10 @@ const maybeSignInWithFirebase = async (email: string, password: string) => {
     const idToken = await credentials.user.getIdToken();
     setCachedAuthToken(idToken);
     onUseLocalStorage('save', `firebase-${APP_NAME}`, idToken);
-  } catch (error) {
-    console.error('Firebase sign-in failed', error);
+  } catch (error: any) {
+    // Firebase auth is optional - silently fail
+    // Common reasons: user doesn't exist in Firebase Auth, wrong password, or Firebase not configured
+    // This is expected behavior when using GraphQL-only authentication
+    // Don't throw - allow GraphQL login to proceed
   }
 };
