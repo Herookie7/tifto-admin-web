@@ -79,8 +79,9 @@ export interface IRestaurantResponse {
 // Updated to support pagination
 export interface IPaginatedRestaurantResponse {
   data: IRestaurantResponse[];
-  totalCount: number;
-  currentPage: number;
+  total: number;
+  page: number;
+  limit: number;
   totalPages: number;
 }
 

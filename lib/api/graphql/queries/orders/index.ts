@@ -294,16 +294,8 @@ export const GET_ORDERS = gql`
 `;
 
 export const GET_ORDERS_WITHOUT_PAGINATION = gql`
-  query OrdersWithoutPagination(
-    $dateKeyword: String
-    $starting_date: String
-    $ending_date: String
-  ) {
-    allOrdersWithoutPagination(
-      dateKeyword: $dateKeyword
-      starting_date: $starting_date
-      ending_date: $ending_date
-    ) {
+  query OrdersWithoutPagination($filters: FiltersInput) {
+    allOrdersWithoutPagination(filters: $filters) {
       _id
       orderId
       restaurant {

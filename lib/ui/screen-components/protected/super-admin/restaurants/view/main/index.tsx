@@ -84,9 +84,11 @@ export default function RestaurantsMain() {
 
   // Query variables
   const queryVariables = {
-    page: currentPage,
-    limit: rowsPerPage,
-    search: debouncedSearchTerm || undefined,
+    filters: {
+      page: currentPage,
+      limit: rowsPerPage,
+      search: debouncedSearchTerm || undefined,
+    },
   };
 
   //Query
@@ -190,7 +192,7 @@ export default function RestaurantsMain() {
   : data?.getClonedRestaurantsPaginated;
 
   const restaurants = restaurantData?.data || [];
-  const totalRecords = restaurantData?.totalCount || 0;
+  const totalRecords = restaurantData?.total || 0;
 
   return (
     <div className="p-3">

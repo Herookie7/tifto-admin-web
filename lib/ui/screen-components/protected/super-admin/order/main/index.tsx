@@ -50,9 +50,12 @@ export default function OrderSuperAdminMain() {
   const { data, error, loading } = useQueryGQL(
     GET_ORDERS_WITHOUT_PAGINATION,
     {
-      dateKeyword: dateFilter.dateKeyword,
-      starting_date: dateFilter?.startDate,
-      ending_date: dateFilter?.endDate,
+      filters: {
+        search: dateFilter?.search,
+        status: dateFilter?.status,
+        starting_date: dateFilter?.startDate,
+        ending_date: dateFilter?.endDate,
+      },
     },
     {
       fetchPolicy: 'network-only',

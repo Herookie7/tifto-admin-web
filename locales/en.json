@@ -804,6 +804,8 @@
   "Month": "Month",
   "Year": "Year",
   "Custom": "Custom",
+  "custom": "custom",
+  "Status Changed Successfully": "Status Changed Successfully",
   "Filter tasks": "Filter tasks",
   "has been uploaded successfully": "has been uploaded successfully",
   "File": "File",

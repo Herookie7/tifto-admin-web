@@ -70,8 +70,8 @@ export const GET_CLONED_RESTAURANTS = gql`
 `;
 
 export const GET_RESTAURANTS_BY_OWNER = gql`
-  query RestaurantByOwner($id: String) {
-    restaurantByOwner(id: $id) {
+  query RestaurantByOwner($id: String!) {
+    restaurantByOwner(ownerId: $id) {
       _id
       email
       userType
@@ -194,8 +194,8 @@ export const GET_RESTAURANT_PROFILE = gql`
 `;
 
 export const GET_RESTAURANTS_PAGINATED = gql`
-  query restaurantsPaginated($page: Int, $limit: Int, $search: String) {
-    restaurantsPaginated(page: $page, limit: $limit, search: $search) {
+  query restaurantsPaginated($filters: FiltersInput) {
+    restaurantsPaginated(filters: $filters) {
       data {
         unique_restaurant_id
         _id
@@ -217,20 +217,17 @@ export const GET_RESTAURANTS_PAGINATED = gql`
         }
         shopType
       }
-      totalCount
-      currentPage
+      total
+      page
+      limit
       totalPages
     }
   }
 `;
 
 export const GET_CLONED_RESTAURANTS_PAGINATED = gql`
-  query getClonedRestaurantsPaginated(
-    $page: Int
-    $limit: Int
-    $search: String
-  ) {
-    getClonedRestaurantsPaginated(page: $page, limit: $limit, search: $search) {
+  query getClonedRestaurantsPaginated($filters: FiltersInput) {
+    getClonedRestaurantsPaginated(filters: $filters) {
       data {
         _id
         name
@@ -252,8 +249,9 @@ export const GET_CLONED_RESTAURANTS_PAGINATED = gql`
         }
         shopType
       }
-      totalCount
-      currentPage
+      total
+      page
+      limit
       totalPages
     }
   }
