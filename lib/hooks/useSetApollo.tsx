@@ -34,31 +34,39 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   });
 
   // WebSocketLink with error handling
-  const wsLink = new WebSocketLink(
-    new SubscriptionClient(`${WS_SERVER_URL}graphql`, {
-      reconnect: true,
-      timeout: 30000,
-      lazy: true,
-      connectionParams: () => {
-        const token = getCachedAuthToken();
-        if (token) {
-          return {
-            Authorization: `Bearer ${token}`,
-          };
-        }
-        return {};
-      },
-      onError: (error) => {
-        console.error('WebSocket connection error:', error);
-      },
-      onDisconnected: () => {
-        console.warn('WebSocket disconnected');
-      },
-      onReconnected: () => {
-        console.log('WebSocket reconnected');
-      },
-    })
-  );
+  const subscriptionClient = new SubscriptionClient(`${WS_SERVER_URL}graphql`, {
+    reconnect: true,
+    timeout: 30000,
+    lazy: true,
+    connectionParams: () => {
+      const token = getCachedAuthToken();
+      if (token) {
+        return {
+          Authorization: `Bearer ${token}`,
+        };
+      }
+      return {};
+    },
+  });
+
+  // Handle WebSocket connection events
+  subscriptionClient.on('connected', () => {
+    console.log('WebSocket connected');
+  });
+
+  subscriptionClient.on('disconnected', () => {
+    console.warn('WebSocket disconnected');
+  });
+
+  subscriptionClient.on('reconnected', () => {
+    console.log('WebSocket reconnected');
+  });
+
+  subscriptionClient.on('error', (error) => {
+    console.error('WebSocket connection error:', error);
+  });
+
+  const wsLink = new WebSocketLink(subscriptionClient);
 
   // Error Handling Link using ApolloLink's onError (for network errors)
   const errorLink = onError(({ networkError, graphQLErrors }) => {
