@@ -60,7 +60,10 @@ const Layout = ({ children }: IProvider) => {
         });
 
         if (!messaging) {
-          console.error('🔥 Firebase Messaging failed to initialize.');
+          // Firebase config might be intentionally missing, so only warn in development
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ Firebase Messaging is not available. This is normal if Firebase is not configured.');
+          }
           return;
         }
 

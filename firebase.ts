@@ -13,9 +13,12 @@ export const initialize = (config: IFirebaseConfig): Messaging | null => {
     !config.FIREBASE_APP_ID ||
     !config.FIREBASE_MEASUREMENT_ID
   ) {
-    console.error(
-      '🔥 Missing Firebase configuration values. Firebase will not be initialized.'
-    );
+    // Only log warning in development, silently skip in production
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        '⚠️ Firebase configuration values are missing. Firebase Messaging will not be initialized. This is normal if Firebase is not configured.'
+      );
+    }
     return null; // Return null if config is incomplete
   }
 

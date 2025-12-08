@@ -24,6 +24,13 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
 
   const httpLink = createHttpLink({
     uri: `${SERVER_URL}graphql`,
+    fetchOptions: {
+      mode: 'cors',
+      credentials: 'omit',
+    },
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 
   // WebSocketLink with error handling
@@ -41,13 +48,27 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
         }
         return {};
       },
+      onError: (error) => {
+        console.error('WebSocket connection error:', error);
+      },
+      onDisconnected: () => {
+        console.warn('WebSocket disconnected');
+      },
+      onReconnected: () => {
+        console.log('WebSocket reconnected');
+      },
     })
   );
 
   // Error Handling Link using ApolloLink's onError (for network errors)
   const errorLink = onError(({ networkError, graphQLErrors }) => {
     if (networkError) {
-      console.error('Network Error:', networkError);
+      // Handle CORS errors more gracefully
+      if ('statusCode' in networkError || (networkError.message && networkError.message.includes('CORS'))) {
+        console.warn('CORS or network error detected. This may be a backend configuration issue.');
+      } else {
+        console.error('Network Error:', networkError);
+      }
     }
 
     if (graphQLErrors) {
