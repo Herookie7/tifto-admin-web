@@ -97,7 +97,7 @@ export default function RestaurantStatesTable({
                         loading={salesDetailsLoading}
                         title={item._type}
                         data={item.data}
-                        amountConfig={{ currency: CURRENCY_CODE ?? 'USD' }}
+                        amountConfig={{ currency: CURRENCY_CODE ?? 'INR' }}
                       />
                     );
                   })

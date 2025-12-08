@@ -186,7 +186,7 @@ export default function CustomerSupportMain({ activeTab = 'tickets'}: ICustomerS
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(parseInt(dateString));
-      return date.toLocaleDateString('en-US', { 
+      return date.toLocaleDateString('en-IN', { 
         year: 'numeric', 
         month: 'short', 
         day: 'numeric' 

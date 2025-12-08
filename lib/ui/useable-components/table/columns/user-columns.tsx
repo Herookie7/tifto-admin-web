@@ -64,13 +64,13 @@ export const USERS_TABLE_COLUMNS = () => {
         const date = new Date(user.lastLogin);
 
         // Format date and time
-        const formattedDate = date.toLocaleDateString('en-GB', {
+        const formattedDate = date.toLocaleDateString('en-IN', {
           day: '2-digit',
           month: 'short',
           year: 'numeric',
         });
 
-        const formattedTime = date.toLocaleTimeString('en-GB', {
+        const formattedTime = date.toLocaleTimeString('en-IN', {
           hour: '2-digit',
           minute: '2-digit',
         });
@@ -89,7 +89,7 @@ export const USERS_TABLE_COLUMNS = () => {
       body: (user: IUserResponse) => {
         const formattedDate = new Date(
           Number(user.createdAt)
-        ).toLocaleDateString('en-GB');
+        ).toLocaleDateString('en-IN');
         return <div className="flex items-center gap-2">{formattedDate}</div>;
       },
     },

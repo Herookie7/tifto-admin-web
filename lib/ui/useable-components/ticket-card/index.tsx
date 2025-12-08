@@ -82,7 +82,7 @@ function TicketCard({
       }
       
       // Format date for older messages
-      return new Date(date).toLocaleDateString('en-US', {
+      return new Date(date).toLocaleDateString('en-IN', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -96,7 +96,7 @@ function TicketCard({
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(parseInt(dateString));
-      return date.toLocaleDateString('en-US', { 
+      return date.toLocaleDateString('en-IN', { 
         month: 'short',
         day: 'numeric',
         hour: '2-digit',

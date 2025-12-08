@@ -36,7 +36,7 @@ export const ORDER_COLUMNS = () => {
       body: (rowData: IExtendedOrder) => {
         const formatedDate = new Date(
           Number(rowData?.createdAt)
-        ).toLocaleDateString('en-US', dateOptions);
+        ).toLocaleDateString('en-IN', dateOptions);
         return <span>{formatedDate}</span>;
       },
     },

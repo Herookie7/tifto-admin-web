@@ -63,7 +63,7 @@ export const ORDER_SUPER_ADMIN_COLUMNS = () => {
 
         if (date) {
           const newDate = date.toLocaleDateString(
-            'en-US',
+            'en-IN',
             dateOptions
           );
           return <span className="text-center">{newDate}</span>;
