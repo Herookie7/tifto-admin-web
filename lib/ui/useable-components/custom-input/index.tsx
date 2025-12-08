@@ -26,8 +26,8 @@ export default function CustomNumberTextField({
   // Formik
   const { setFieldValue } = useFormikContext();
   // Configuration
-  const { CURRENCY_SYMBOL } = useConfiguration();
-  const currencyPrefix = CURRENCY_SYMBOL ? `${CURRENCY_SYMBOL} ` : '₹ ';
+  const { CURRENT_SYMBOL } = useConfiguration();
+  const currencyPrefix = CURRENT_SYMBOL ? `${CURRENT_SYMBOL} ` : '₹ ';
 
   const MIN_VALUE = 1;
   const MAX_VALUE = 100;
