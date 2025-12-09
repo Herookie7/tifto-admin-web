@@ -195,6 +195,12 @@ export const CouponErrors: ICouponErrors = {
     'You have reached the maximum limit!',
     'Title is a required field',
   ],
+  code: [
+    'Required',
+    'Code cannot be only spaces',
+    'You have reached the maximum limit!',
+    'Code is a required field',
+  ],
   discount: [
     'Required',
     'Discount is a required field',
