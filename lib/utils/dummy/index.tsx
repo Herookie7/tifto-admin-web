@@ -361,6 +361,7 @@ export const generateDummyCoupons = (count: number = 10) => {
     coupons.push({
       _id: `coupon_${i + 1}`,
       title: `coupon_${i + 1}`,
+      code: `CODE${i + 1}`,
       __typename: `coupon_${i + 1}`,
       discount: Math.floor(Math.random() * i + 15),
       enabled: Math.random() * 3 > 2,
