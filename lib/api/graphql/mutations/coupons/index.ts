@@ -5,6 +5,7 @@ export const CREATE_COUPON = gql`
     createCoupon(couponInput: $couponInput) {
       _id
       title
+      code
       discount
       enabled
     }
@@ -15,6 +16,7 @@ export const EDIT_COUPON = gql`
     editCoupon(couponInput: $couponInput) {
       _id
       title
+      code
       discount
       enabled
     }

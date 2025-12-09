@@ -44,6 +44,7 @@ export default function CouponForm({
   const initialValues = {
     _id: isEditing.bool ? isEditing?.data?._id : '',
     title: isEditing.bool ? isEditing?.data?.title : '',
+    code: isEditing.bool ? isEditing?.data?.code || '' : '',
     discount: isEditing.bool ? isEditing?.data?.discount : 0,
     enabled: isEditing.bool ? isEditing?.data?.enabled : true,
   };
@@ -62,13 +63,14 @@ export default function CouponForm({
         });
         setIsEditing({
           bool: false,
-          data: {
-            __typename: '',
-            _id: '',
-            discount: 0,
-            enabled: false,
-            title: '',
-          },
+            data: {
+              __typename: '',
+              _id: '',
+              discount: 0,
+              enabled: false,
+              title: '',
+              code: '',
+            },
         });
       },
       onError: (err) => {
@@ -82,13 +84,14 @@ export default function CouponForm({
         });
         setIsEditing({
           bool: false,
-          data: {
-            __typename: '',
-            _id: '',
-            discount: 0,
-            enabled: false,
-            title: '',
-          },
+            data: {
+              __typename: '',
+              _id: '',
+              discount: 0,
+              enabled: false,
+              title: '',
+              code: '',
+            },
         });
       },
     }
@@ -106,13 +109,14 @@ export default function CouponForm({
         });
         setIsEditing({
           bool: false,
-          data: {
-            __typename: '',
-            _id: '',
-            discount: 0,
-            enabled: false,
-            title: '',
-          },
+            data: {
+              __typename: '',
+              _id: '',
+              discount: 0,
+              enabled: false,
+              title: '',
+              code: '',
+            },
         });
       },
       onError: (err) => {
@@ -126,13 +130,14 @@ export default function CouponForm({
         });
         setIsEditing({
           bool: false,
-          data: {
-            __typename: '',
-            _id: '',
-            discount: 0,
-            enabled: false,
-            title: '',
-          },
+            data: {
+              __typename: '',
+              _id: '',
+              discount: 0,
+              enabled: false,
+              title: '',
+              code: '',
+            },
         });
       },
     }
@@ -156,6 +161,7 @@ export default function CouponForm({
           if (!isEditing.bool) {
             formData = {
               title: values.title,
+              code: values.code,
               discount: values.discount,
               enabled: values.enabled,
             };
@@ -163,6 +169,7 @@ export default function CouponForm({
             formData = {
               _id: values._id,
               title: values.title,
+              code: values.code,
               discount: values.discount,
               enabled: values.enabled,
             };
@@ -227,6 +234,24 @@ export default function CouponForm({
                     borderColor: onErrorMessageMatcher(
                       'title',
                       errors?.title,
+                      CouponErrors
+                    )
+                      ? 'red'
+                      : '',
+                  }}
+                />
+
+                <CustomTextField
+                  value={values.code}
+                  name="code"
+                  showLabel={true}
+                  placeholder={t('Code')}
+                  type="text"
+                  onChange={(e) => setFieldValue('code', e.target.value)}
+                  style={{
+                    borderColor: onErrorMessageMatcher(
+                      'code',
+                      errors?.code,
                       CouponErrors
                     )
                       ? 'red'

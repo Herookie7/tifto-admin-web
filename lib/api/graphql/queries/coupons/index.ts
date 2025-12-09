@@ -5,6 +5,7 @@ export const GET_COUPONS = gql`
     coupons {
       _id
       title
+      code
       discount
       enabled
     }

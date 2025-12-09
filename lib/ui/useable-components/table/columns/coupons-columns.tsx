@@ -74,6 +74,7 @@ export const COUPONS_TABLE_COLUMNS = ({
     const updatedCoupon = {
       _id: rowData?._id,
       title: rowData?.title,
+      code: rowData?.code,
       discount: rowData?.discount,
       enabled: !rowData?.enabled
     };
@@ -93,7 +94,7 @@ export const COUPONS_TABLE_COLUMNS = ({
       },
       {
         headerName: t('Code'),
-        propertyName: 'title',
+        propertyName: 'code',
       },
       {
         headerName: t('Discount'),

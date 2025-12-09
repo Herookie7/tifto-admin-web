@@ -6,6 +6,7 @@ export interface ICoupon {
   discount: number;
   enabled: boolean;
   title: string;
+  code: string | null;
   __typename: string;
   _id: string;
 }

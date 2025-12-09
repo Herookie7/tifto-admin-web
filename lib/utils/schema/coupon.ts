@@ -6,6 +6,11 @@ export const CouponFormSchema = Yup.object().shape({
     .trim()
     .matches(/\S/, 'Name cannot be only spaces')
     .required('Title is a required field'),
+  code: Yup.string()
+    .max(50, 'You have reached the maximum limit!')
+    .trim()
+    .matches(/\S/, 'Code cannot be only spaces')
+    .required('Code is a required field'),
   discount: Yup.number()
     .required('Discount is a required field')
     .min(1, 'The minimum starting value is one')
