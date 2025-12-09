@@ -196,6 +196,7 @@ export default function CouponForm({
               discount: 0,
               enabled: true,
               title: '',
+              code: '',
             },
           });
           setVisible(false);
