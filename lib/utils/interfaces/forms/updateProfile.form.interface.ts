@@ -45,6 +45,6 @@ export interface IUpdateProfileForm {
   email: string;
   orderprefix: string;
   deliveryCharges: number;
-  longitude: number | string;
-  latitude: number | string;
+  longitude: number | null;
+  latitude: number | null;
 }

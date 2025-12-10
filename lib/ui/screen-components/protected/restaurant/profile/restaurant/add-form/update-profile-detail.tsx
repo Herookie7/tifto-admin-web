@@ -127,8 +127,8 @@ export default function UpdateRestaurantDetails({
       email: restaurantData?.email ?? restaurantData?.username ?? '',
       orderprefix: restaurantData?.orderPrefix ?? '',
       deliveryCharges: restaurantData?.deliveryCharges ?? 0,
-      longitude: restaurantData?.location?.coordinates?.[0] ?? '',
-      latitude: restaurantData?.location?.coordinates?.[1] ?? '',
+      longitude: restaurantData?.location?.coordinates?.[0] ?? null,
+      latitude: restaurantData?.location?.coordinates?.[1] ?? null,
     };
   }, [restaurantProfileResponse.data?.restaurant]);
 
@@ -163,8 +163,8 @@ export default function UpdateRestaurantDetails({
             cuisines: data.cuisines.map((cuisine) => cuisine.code),
             email: data.email,
             deliveryCharges: data.deliveryCharges,
-            location: data.longitude && data.latitude 
-              ? [parseFloat(data.longitude.toString()), parseFloat(data.latitude.toString())]
+            location: data.longitude !== null && data.latitude !== null 
+              ? [data.longitude, data.latitude]
               : undefined,
           },
         },
