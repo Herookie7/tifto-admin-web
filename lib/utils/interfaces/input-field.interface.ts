@@ -97,4 +97,5 @@ export interface ICustomNumberTippingProps extends IGlobalTextFieldProps {
   min?: number;
   max?: number;
   loading: boolean;
+  commissionType?: string;
 }

@@ -31,6 +31,7 @@ export const GET_RESTAURANTS = gql`
       minimumOrder
       isActive
       commissionRate
+      commissionType
       username
       tax
       owner {
@@ -57,6 +58,7 @@ export const GET_CLONED_RESTAURANTS = gql`
       minimumOrder
       isActive
       commissionRate
+      commissionType
       username
       tax
       owner {
@@ -205,6 +207,7 @@ export const GET_RESTAURANTS_PAGINATED = gql`
         minimumOrder
         isActive
         commissionRate
+      commissionType
         username
         tax
         owner {
@@ -237,6 +240,7 @@ export const GET_CLONED_RESTAURANTS_PAGINATED = gql`
         minimumOrder
         isActive
         commissionRate
+      commissionType
         username
         tax
         owner {

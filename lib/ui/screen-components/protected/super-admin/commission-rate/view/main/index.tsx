@@ -64,7 +64,7 @@ export default function CommissionRateMain() {
   // Handlers
   const handleSave = async (restaurantId: string) => {
     const restaurant = restaurants.find((r) => r._id === restaurantId);
-    if (!restaurant?.commissionRate) {
+    if (!restaurant || restaurant.commissionRate === undefined || restaurant.commissionRate === null) {
       return showToast({
         type: 'error',
         title: t('Commission Updated'),
@@ -73,7 +73,10 @@ export default function CommissionRateMain() {
     }
     if (restaurant) {
       setLoadingRestaurant(restaurantId);
-      if (restaurant?.commissionRate > 100) {
+      const commissionType = restaurant.commissionType || 'percentage';
+      
+      // Validate percentage commission rate
+      if (commissionType === 'percentage' && restaurant.commissionRate > 100) {
         setLoadingRestaurant(null);
         return showToast({
           type: 'error',
@@ -83,11 +86,23 @@ export default function CommissionRateMain() {
           ),
         });
       }
+
+      // Validate fixed commission rate
+      if (commissionType === 'fixed' && restaurant.commissionRate < 0) {
+        setLoadingRestaurant(null);
+        return showToast({
+          type: 'error',
+          title: t('Commission Updated'),
+          message: t('Fixed commission rate cannot be negative'),
+        });
+      }
+
       try {
         await updateCommissionMutation({
           variables: {
             id: restaurantId,
-            commissionRate: parseFloat(String(restaurant?.commissionRate)),
+            commissionType: commissionType,
+            commissionRate: parseFloat(String(restaurant.commissionRate)),
           },
         });
         showToast({
@@ -120,6 +135,21 @@ export default function CommissionRateMain() {
       prevRestaurants.map((restaurant) =>
         restaurant._id === restaurantId
           ? { ...restaurant, commissionRate: value }
+          : restaurant
+      )
+    );
+    setEditingRestaurantIds((prev) => {
+      const newSet = new Set(prev);
+      newSet.add(restaurantId);
+      return newSet;
+    });
+  };
+
+  const handleCommissionTypeChange = (restaurantId: string, type: string) => {
+    setRestaurants((prevRestaurants) =>
+      prevRestaurants.map((restaurant) =>
+        restaurant._id === restaurantId
+          ? { ...restaurant, commissionType: type }
           : restaurant
       )
     );
@@ -172,6 +202,10 @@ export default function CommissionRateMain() {
     if (data?.restaurants) {
       let updatedRestaurants = data.restaurants.map((v) => {
         let obj = { ...v };
+        // Set default commissionType to 'percentage' if not present (backward compatibility)
+        if (!obj.commissionType) {
+          obj.commissionType = 'percentage';
+        }
         console.log(v.commissionRate);
         // if (v.commissionRate === null) obj['commissionRate'] = 25;
 
@@ -201,6 +235,7 @@ export default function CommissionRateMain() {
         columns={COMMISSION_RATE_COLUMNS({
           handleSave,
           handleCommissionRateChange,
+          handleCommissionTypeChange,
           loadingRestaurant,
         })}
         loading={loading}

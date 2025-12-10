@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 export const COMMISSION_RATE_COLUMNS = ({
   handleSave,
   handleCommissionRateChange,
+  handleCommissionTypeChange,
   loadingRestaurant,
 }: ICommissionColumnProps & { loadingRestaurant: string | null }) => {
   // Hooks
@@ -29,41 +30,105 @@ export const COMMISSION_RATE_COLUMNS = ({
       ),
     },
     {
+      headerName: t('Commission Type'),
+      propertyName: 'commissionType',
+      body: (restaurant: IRestaurantResponse) => {
+        const currentType = restaurant.commissionType || 'percentage';
+        return (
+          <Formik
+            initialValues={{
+              [`commissionType-${restaurant._id}`]: currentType,
+            }}
+            onSubmit={() => {
+              handleSave(restaurant._id);
+            }}
+          >
+            {({ values, handleChange, handleSubmit }) => (
+              <Form onSubmit={handleSubmit}>
+                <div className="flex gap-2">
+                  <label className="flex items-center gap-1">
+                    <input
+                      type="radio"
+                      name={`commissionType-${restaurant._id}`}
+                      value="percentage"
+                      checked={values[`commissionType-${restaurant._id}`] === 'percentage'}
+                      onChange={(e) => {
+                        handleChange(e);
+                        if (handleCommissionTypeChange) {
+                          handleCommissionTypeChange(restaurant._id, e.target.value);
+                        }
+                      }}
+                      className="mr-1"
+                    />
+                    <span className="text-sm">{t('Percentage')}</span>
+                  </label>
+                  <label className="flex items-center gap-1">
+                    <input
+                      type="radio"
+                      name={`commissionType-${restaurant._id}`}
+                      value="fixed"
+                      checked={values[`commissionType-${restaurant._id}`] === 'fixed'}
+                      onChange={(e) => {
+                        handleChange(e);
+                        if (handleCommissionTypeChange) {
+                          handleCommissionTypeChange(restaurant._id, e.target.value);
+                        }
+                      }}
+                      className="mr-1"
+                    />
+                    <span className="text-sm">{t('Fixed')}</span>
+                  </label>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        );
+      },
+    },
+    {
       headerName: t('Set Commission Rate'),
       propertyName: 'commissionRate',
-      body: (restaurant: IRestaurantResponse) => (
-        <Formik
-          initialValues={{
-            [`commissionRate-${restaurant._id}`]: restaurant.commissionRate,
-          }}
-          onSubmit={() => {
-            handleSave(restaurant._id);
-          }}
-        >
-          {({ values, handleChange, handleSubmit }) => (
-            <Form onSubmit={handleSubmit}>
-              <div className="flex">
-                <CustomCommissionTextField
-                  type="number"
-                  name={`commissionRate-${restaurant._id}`}
-                  value={String(values[`commissionRate-${restaurant._id}`])}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    handleChange(e);
-                    handleCommissionRateChange(
-                      restaurant._id,
-                      parseFloat(e.target.value)
-                    );
-                  }}
-                  min={0}
-                  max={100}
-                  showLabel={false}
-                  loading={false}
-                />
-              </div>
-            </Form>
-          )}
-        </Formik>
-      ),
+      body: (restaurant: IRestaurantResponse) => {
+        const currentType = restaurant.commissionType || 'percentage';
+        const isPercentage = currentType === 'percentage';
+        return (
+          <Formik
+            initialValues={{
+              [`commissionRate-${restaurant._id}`]: restaurant.commissionRate || 0,
+            }}
+            onSubmit={() => {
+              handleSave(restaurant._id);
+            }}
+          >
+            {({ values, handleChange, handleSubmit }) => (
+              <Form onSubmit={handleSubmit}>
+                <div className="flex items-center gap-2">
+                  <CustomCommissionTextField
+                    type="number"
+                    name={`commissionRate-${restaurant._id}`}
+                    value={String(values[`commissionRate-${restaurant._id}`] || 0)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      handleChange(e);
+                      handleCommissionRateChange(
+                        restaurant._id,
+                        parseFloat(e.target.value) || 0
+                      );
+                    }}
+                    min={0}
+                    max={isPercentage ? 100 : undefined}
+                    showLabel={false}
+                    loading={false}
+                    commissionType={currentType}
+                  />
+                  <span className="text-sm text-gray-600">
+                    {isPercentage ? '%' : 'Rs.'}
+                  </span>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        );
+      },
     },
     {
       headerName: t('Actions'),

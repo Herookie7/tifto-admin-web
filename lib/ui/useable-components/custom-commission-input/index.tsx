@@ -10,10 +10,13 @@ export default function CustomCommissionTextField({
   name,
   value,
   onChange,
+  commissionType = 'percentage',
+  max,
   ...props
 }: ICustomNumberTippingProps) {
   const MIN_VALUE = 0;
-  const MAX_VALUE = 100;
+  const MAX_VALUE = commissionType === 'percentage' ? (max || 100) : undefined;
+  const isPercentage = commissionType === 'percentage';
 
   const handleChange = (newValue: string) => {
     if (onChange) {
@@ -27,7 +30,7 @@ export default function CustomCommissionTextField({
     const currentValue = parseFloat(value as string);
     if (isNaN(currentValue)) {
       handleChange(MIN_VALUE.toString());
-    } else if (currentValue < MAX_VALUE) {
+    } else if (MAX_VALUE === undefined || currentValue < MAX_VALUE) {
       handleChange((currentValue + 1).toString());
     }
   };
