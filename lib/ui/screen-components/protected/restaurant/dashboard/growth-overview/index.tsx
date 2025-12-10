@@ -37,7 +37,7 @@ export default function GrowthOverView() {
     },
     {
       fetchPolicy: 'network-only',
-      enabled: !!restaurantId && !error, // Skip if there's an error
+      enabled: !!restaurantId,
       debounceMs: 300,
       onError: (err) => {
         // Silently handle missing query errors or type mismatches
