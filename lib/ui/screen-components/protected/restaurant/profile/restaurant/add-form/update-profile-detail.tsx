@@ -124,8 +124,11 @@ export default function UpdateRestaurantDetails({
         : [],
       image: restaurantData?.image ?? '',
       logo: restaurantData?.logo ?? '',
-      email: restaurantData?.username ?? '',
+      email: restaurantData?.email ?? restaurantData?.username ?? '',
       orderprefix: restaurantData?.orderPrefix ?? '',
+      deliveryCharges: restaurantData?.deliveryCharges ?? 0,
+      longitude: restaurantData?.location?.coordinates?.[0] ?? '',
+      latitude: restaurantData?.location?.coordinates?.[1] ?? '',
     };
   }, [restaurantProfileResponse.data?.restaurant]);
 
@@ -158,6 +161,11 @@ export default function UpdateRestaurantDetails({
             salesTax: data.salesTax,
             orderPrefix: data.orderprefix,
             cuisines: data.cuisines.map((cuisine) => cuisine.code),
+            email: data.email,
+            deliveryCharges: data.deliveryCharges,
+            location: data.longitude && data.latitude 
+              ? [parseFloat(data.longitude.toString()), parseFloat(data.latitude.toString())]
+              : undefined,
           },
         },
       });
@@ -393,6 +401,58 @@ export default function UpdateRestaurantDetails({
                           : '',
                       }}
                     />
+
+                    <CustomNumberField
+                      min={0}
+                      max={99999}
+                      placeholder={t('Delivery Charges')}
+                      name="deliveryCharges"
+                      showLabel={true}
+                      value={values.deliveryCharges}
+                      onChange={setFieldValue}
+                      minFractionDigits={2}
+                      maxFractionDigits={2}
+                    />
+
+                    <CustomIconTextField
+                      type="email"
+                      name="email"
+                      placeholder={t('Contact Email')}
+                      maxLength={100}
+                      showLabel={true}
+                      iconProperties={{
+                        icon: faEnvelope,
+                        position: 'right',
+                        style: { marginTop: '1px' },
+                      }}
+                      value={values.email}
+                      onChange={handleChange}
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <CustomNumberField
+                        placeholder={t('Longitude')}
+                        name="longitude"
+                        showLabel={true}
+                        value={values.longitude}
+                        onChange={setFieldValue}
+                        min={-180}
+                        max={180}
+                        minFractionDigits={6}
+                        maxFractionDigits={6}
+                      />
+                      <CustomNumberField
+                        placeholder={t('Latitude')}
+                        name="latitude"
+                        showLabel={true}
+                        value={values.latitude}
+                        onChange={setFieldValue}
+                        min={-90}
+                        max={90}
+                        minFractionDigits={6}
+                        maxFractionDigits={6}
+                      />
+                    </div>
 
                     <CustomTextField
                       placeholder={t('Order Prefix')}

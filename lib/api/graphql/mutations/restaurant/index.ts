@@ -105,6 +105,8 @@ export const EDIT_RESTAURANT = gql`
       isAvailable
       minimumOrder
       tax
+      deliveryCharges
+      email
       openingTimes {
         day
         times {
