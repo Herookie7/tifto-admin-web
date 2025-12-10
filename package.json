@@ -15,7 +15,8 @@
     "prettier": "prettier --write .",
     "prepare": "husky || true",
     "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:run": "cypress run",
+    "test:pages": "node test-all-pages.js"
   },
   "dependencies": {
     "@apollo/client": "^3.11.8",
@@ -74,6 +75,7 @@
     "ts-node": "^10.9.2",
     "tslib": "^2.6.3",
     "typescript": "^5.6.2",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "webpack-bundle-analyzer": "^4.10.2",
+    "puppeteer": "^21.6.1"
   }
 }

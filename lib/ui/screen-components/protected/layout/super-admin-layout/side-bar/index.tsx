@@ -60,15 +60,15 @@ export default function MakeSidebar() {
     useContext<LayoutContextProps>(LayoutContext);
 
   const navBarItems: ISidebarMenuItem[] = [
-    {
-      text: 'My Website',
-      label: t('My Website'),
-      route: 'https://tifto.tifto.com/',
-      isParent: true,
-      icon: faUpRightFromSquare,
-      isClickable: true,
-      shouldOpenInNewTab: true,
-    },
+    // {
+    //   text: 'My Website',
+    //   label: t('My Website'),
+    //   route: 'https://tifto.tifto.com/',
+    //   isParent: true,
+    //   icon: faUpRightFromSquare,
+    //   isClickable: true,
+    //   shouldOpenInNewTab: true,
+    // },
     {
       text: 'Home',
       label: t('Home'),

@@ -63,7 +63,7 @@ export const useConfiguration = () => {
   const APP_PRIVACY = configuration?.privacyPolicy;
   const APP_TEST_OTP = configuration?.testOtp;
   const CURRENCY_CODE = configuration?.currency;
-  const CURRENCY_SYMBOL = configuration?.currencySymbol || '₹';
+  const CURRENCY_SYMBOL = configuration?.currency;
   const ISPAID_VERSION = configuration?.isPaidVersion;
 
   const envServerRest =
