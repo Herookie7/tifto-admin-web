@@ -23,12 +23,14 @@ export interface IRestaurantData extends IGlobalComponentProps {
   username: string;
   password: string;
   phone?: string;
+  email?: string;
   image: string;
   logo: string;
   name: string;
   address: string;
   deliveryTime?: number;
   minimumOrder?: number;
+  deliveryCharges?: number;
   tax?: number;
   orderPrefix: string;
   shopType: string;
