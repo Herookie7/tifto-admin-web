@@ -1,0 +1,358 @@
+{
+  "timestamp": "2025-12-08T18:38:42.223Z",
+  "graphqlUrl": "https://ftifto-backend.onrender.com/graphql",
+  "frontendUrl": "https://tifto-admin-web.onrender.com",
+  "backendUrl": "https://ftifto-backend.onrender.com",
+  "totalQueries": 10,
+  "tested": 10,
+  "successful": 10,
+  "failed": 0,
+  "errors": [],
+  "queryResults": {
+    "vendors": {
+      "queryName": "vendors",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "vendors": [
+          {
+            "_id": "6926ff88411dec930d6dc1e7",
+            "name": "Spice Garden Restaurant Owner",
+            "email": "spicegardenrestaurant@mandsaur.test",
+            "restaurants": [
+              {
+                "_id": "6926ff88411dec930d6dc1ea",
+                "name": "Spice Garden Restaurant"
+              }
+            ]
+          },
+          {
+            "_id": "6926ff89411dec930d6dc20f",
+            "name": "Mandsaur Sweets & Snacks Owner",
+            "email": "mandsaursweets&snacks@mandsaur.test",
+            "restaurants": [
+              {
+                "_id": "6926ff8a411dec930d6dc211",
+                "name": "Mandsaur Sweets & Snacks"
+              }
+            ]
+          },
+          {
+            "_id": "6926ff8a411dec930d6dc22a",
+            "name": "Fresh Mart Tiffin Owner",
+            "email": "freshmarttiffin@mandsaur.test",
+            "restaurants": [
+              {
+                "_id": "6926ff8a411dec930d6dc22c",
+                "name": "Fresh Mart Tiffin"
+              }
+            ]
+          },
+          {
+            "_id": "6926ff8b411dec930d6dc252",
+            "name": "Pizza Corner Owner",
+            "email": "pizzacorner@mandsaur.test",
+            "restaurants": [
+              {
+                "_id": "6926ff8b411dec930d6dc254",
+                "name": "Pizza Corner"
+              }
+            ]
+          },
+          {
+            "_id": "6926ff8c411dec930d6dc26b",
+            "name": "South Indian Delight Owner",
+            "email": "southindiandelight@mandsaur.test",
+            "restaurants": [
+              {
+                "_id": "6926ff8c411dec930d6dc26d",
+                "name": "South Indian Delight"
+              }
+            ]
+          },
+          {
+            "_id": "6932f44a2a8b0f2f0be454ff",
+            "name": "Seller User",
+            "email": "seller@tifto.test",
+            "restaurants": [
+              {
+                "_id": "6932f5a164ecc747ebd07933",
+                "name": "Demo Restaurant"
+              }
+            ]
+          }
+        ]
+      },
+      "responseTime": 1201
+    },
+    "riders": {
+      "queryName": "riders",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "riders": [
+          {
+            "_id": "693713794b82155c5eb15129",
+            "name": "ridertest",
+            "username": "rider@tensi.org",
+            "phone": "+918719876736",
+            "zone": null
+          }
+        ]
+      },
+      "responseTime": 1169
+    },
+    "users": {
+      "queryName": "users",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "users": [
+          {
+            "_id": "6926ff87411dec930d6dc1de",
+            "name": "Mandsaur Admin",
+            "email": "admin@mandsaur.test"
+          },
+          {
+            "_id": "6926ff87411dec930d6dc1e0",
+            "name": "Mandsaur Customer",
+            "email": "customer@mandsaur.test"
+          },
+          {
+            "_id": "6926ff88411dec930d6dc1e7",
+            "name": "Spice Garden Restaurant Owner",
+            "email": "spicegardenrestaurant@mandsaur.test"
+          },
+          {
+            "_id": "6926ff89411dec930d6dc20f",
+            "name": "Mandsaur Sweets & Snacks Owner",
+            "email": "mandsaursweets&snacks@mandsaur.test"
+          },
+          {
+            "_id": "6926ff8a411dec930d6dc22a",
+            "name": "Fresh Mart Tiffin Owner",
+            "email": "freshmarttiffin@mandsaur.test"
+          },
+          {
+            "_id": "6926ff8b411dec930d6dc252",
+            "name": "Pizza Corner Owner",
+            "email": "pizzacorner@mandsaur.test"
+          },
+          {
+            "_id": "6926ff8c411dec930d6dc26b",
+            "name": "South Indian Delight Owner",
+            "email": "southindiandelight@mandsaur.test"
+          },
+          {
+            "_id": "6929ef0fe2e854555ad89226",
+            "name": "Anoop Sunarthy",
+            "email": "king.ks488@gmail.com"
+          },
+          {
+            "_id": "692ae95e9a759381ef79f2ea",
+            "name": "Anoop Sunarthy",
+            "email": "sunarthy7@gmail.com"
+          },
+          {
+            "_id": "692c391a74663350d3d2bd96",
+            "name": "Ravi Parmar",
+            "email": "ravi.parmar2101@gmail.com"
+          },
+          {
+            "_id": "6932f44a2a8b0f2f0be454ff",
+            "name": "Seller User",
+            "email": "seller@tifto.test"
+          },
+          {
+            "_id": "6935af35d82528f57e61dc55",
+            "name": "Admin User",
+            "email": "herookie@tensi.org"
+          },
+          {
+            "_id": "693713794b82155c5eb15129",
+            "name": "ridertest",
+            "email": null
+          }
+        ]
+      },
+      "responseTime": 606
+    },
+    "restaurants": {
+      "queryName": "restaurants",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "restaurants": [
+          {
+            "_id": "6926ff88411dec930d6dc1ea",
+            "name": "Spice Garden Restaurant",
+            "address": "Main Road, Mandsaur, 458001, Madhya Pradesh",
+            "owner": {
+              "_id": "6926ff88411dec930d6dc1e7",
+              "name": "Spice Garden Restaurant Owner"
+            }
+          },
+          {
+            "_id": "6926ff8a411dec930d6dc211",
+            "name": "Mandsaur Sweets & Snacks",
+            "address": "Gandhi Chowk, Mandsaur, 458001, Madhya Pradesh",
+            "owner": {
+              "_id": "6926ff89411dec930d6dc20f",
+              "name": "Mandsaur Sweets & Snacks Owner"
+            }
+          },
+          {
+            "_id": "6926ff8a411dec930d6dc22c",
+            "name": "Fresh Mart Tiffin",
+            "address": "Market Road, Mandsaur, 458001, Madhya Pradesh",
+            "owner": {
+              "_id": "6926ff8a411dec930d6dc22a",
+              "name": "Fresh Mart Tiffin Owner"
+            }
+          },
+          {
+            "_id": "6926ff8b411dec930d6dc254",
+            "name": "Pizza Corner",
+            "address": "City Center, Mandsaur, 458001, Madhya Pradesh",
+            "owner": {
+              "_id": "6926ff8b411dec930d6dc252",
+              "name": "Pizza Corner Owner"
+            }
+          },
+          {
+            "_id": "6926ff8c411dec930d6dc26d",
+            "name": "South Indian Delight",
+            "address": "Station Road, Mandsaur, 458001, Madhya Pradesh",
+            "owner": {
+              "_id": "6926ff8c411dec930d6dc26b",
+              "name": "South Indian Delight Owner"
+            }
+          },
+          {
+            "_id": "6932f5a164ecc747ebd07933",
+            "name": "Demo Restaurant",
+            "address": "123 Restaurant Street, Demo City",
+            "owner": {
+              "_id": "6932f44a2a8b0f2f0be454ff",
+              "name": "Seller User"
+            }
+          }
+        ]
+      },
+      "responseTime": 864
+    },
+    "staffs": {
+      "queryName": "staffs",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "staffs": [
+          {
+            "_id": "6926ff87411dec930d6dc1de",
+            "name": "Mandsaur Admin",
+            "email": "admin@mandsaur.test"
+          },
+          {
+            "_id": "6935af35d82528f57e61dc55",
+            "name": "Admin User",
+            "email": "herookie@tensi.org"
+          }
+        ]
+      },
+      "responseTime": 731
+    },
+    "zones": {
+      "queryName": "zones",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "zones": [
+          {
+            "_id": "6926ff87411dec930d6dc1cc",
+            "title": "Mandsaur Zone"
+          }
+        ]
+      },
+      "responseTime": 680
+    },
+    "configuration": {
+      "queryName": "configuration",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "configuration": {
+          "_id": "6926ff86411dec930d6dc1c3",
+          "currency": "INR",
+          "currencySymbol": "₹"
+        }
+      },
+      "responseTime": 749
+    },
+    "coupons": {
+      "queryName": "coupons",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "coupons": []
+      },
+      "responseTime": 357
+    },
+    "banners": {
+      "queryName": "banners",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "banners": [
+          {
+            "_id": "6926ff8d411dec930d6dc28f",
+            "title": "Taste of Mandsaur"
+          },
+          {
+            "_id": "6926ff8d411dec930d6dc290",
+            "title": "Evening Snacks at Gandhi Chowk"
+          },
+          {
+            "_id": "6926ff8d411dec930d6dc291",
+            "title": "South Indian Breakfast"
+          }
+        ]
+      },
+      "responseTime": 663
+    },
+    "orders": {
+      "queryName": "orders",
+      "status": "success",
+      "errors": [],
+      "data": {
+        "orders": [
+          {
+            "_id": "6926ff8e411dec930d6dc2ad",
+            "orderId": "TFT-202511261324-553E",
+            "orderStatus": "delivered"
+          },
+          {
+            "_id": "6926ff8e411dec930d6dc2a9",
+            "orderId": "TFT-202511261324-C38B",
+            "orderStatus": "delivered"
+          },
+          {
+            "_id": "6926ff8e411dec930d6dc2a5",
+            "orderId": "TFT-202511261324-BE24",
+            "orderStatus": "delivered"
+          },
+          {
+            "_id": "6926ff8e411dec930d6dc2a1",
+            "orderId": "TFT-202511261324-A69F",
+            "orderStatus": "delivered"
+          },
+          {
+            "_id": "6926ff8e411dec930d6dc29d",
+            "orderId": "TFT-202511261324-43DB",
+            "orderStatus": "delivered"
+          }
+        ]
+      },
+      "responseTime": 918
+    }
+  }
+}

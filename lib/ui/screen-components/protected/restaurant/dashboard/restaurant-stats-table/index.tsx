@@ -61,18 +61,18 @@ export default function RestaurantStatesTable({
 
   // Memo
   const dashboardOrderSalesDetailsByPaymentMethod = useMemo(() => {
-    if (!salesDetailsData) return null;
+    if (!salesDetailsData || error) return null;
     return (
       salesDetailsData?.getDashboardOrderSalesDetailsByPaymentMethod ?? null
     );
-  }, [salesDetailsData]);
+  }, [salesDetailsData, error]);
 
   // Constants
   const paymentMethod = Object.keys(
     dashboardOrderSalesDetailsByPaymentMethod ?? {}
   );
 
-  if (!dashboardOrderSalesDetailsByPaymentMethod) return;
+  if (!dashboardOrderSalesDetailsByPaymentMethod || error) return null;
 
   return (
     <div className="p-3 bg-gray-50 rounded-lg shadow-md space-y-6">
@@ -94,19 +94,27 @@ export default function RestaurantStatesTable({
                     })}
                   </div>
                 ) : (
-                  dashboardOrderSalesDetailsByPaymentMethod[
-                    method as keyof typeof dashboardOrderSalesDetailsByPaymentMethod
-                  ]?.map((item, index) => {
-                    return (
-                      <DashboardRestaurantStatsTable
-                        key={index}
-                        loading={salesDetailsLoading}
-                        title={item._type}
-                        data={item.data}
-                        amountConfig={{ currency: CURRENCY_CODE ?? 'INR' }}
-                      />
-                    );
-                  })
+                  (() => {
+                    const paymentData = dashboardOrderSalesDetailsByPaymentMethod[
+                      method as keyof typeof dashboardOrderSalesDetailsByPaymentMethod
+                    ];
+                    if (!paymentData) return null;
+                    
+                    // Handle both array and single object responses
+                    const dataArray = Array.isArray(paymentData) ? paymentData : [paymentData];
+                    
+                    return dataArray.map((item, index) => {
+                      return (
+                        <DashboardRestaurantStatsTable
+                          key={index}
+                          loading={salesDetailsLoading}
+                          title={item._type}
+                          data={item.data}
+                          amountConfig={{ currency: CURRENCY_CODE ?? 'INR' }}
+                        />
+                      );
+                    });
+                  })()
                 )}
               </div>
             </div>

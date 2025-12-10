@@ -37,12 +37,14 @@ export default function GrowthOverView() {
     },
     {
       fetchPolicy: 'network-only',
-      enabled: !!restaurantId,
+      enabled: !!restaurantId && !error, // Skip if there's an error
       debounceMs: 300,
       onError: (err) => {
-        // Silently handle missing query errors - backend may not have this query deployed
-        if (err.message?.includes('Cannot query field')) {
-          console.warn('Dashboard query not available in backend:', err.message);
+        // Silently handle missing query errors or type mismatches
+        if (err.message?.includes('Cannot query field') || 
+            err.message?.includes('cannot represent non-integer value') ||
+            err.message?.includes('Int cannot represent')) {
+          console.warn('Dashboard query error:', err.message);
         }
       },
     }
@@ -56,11 +58,21 @@ export default function GrowthOverView() {
     const salesAmount = data?.getRestaurantDashboardSalesOrderCountDetailsByYear?.salesAmount;
     const ordersCount = data?.getRestaurantDashboardSalesOrderCountDetailsByYear?.ordersCount;
     
-    // Handle both array and single value responses
-    // Backend may return single values, but chart expects arrays
+    // Backend returns single values (Float and Int), but chart needs arrays for monthly data
+    // For now, return empty arrays if data is not in expected format
+    // TODO: Backend should return monthly breakdown arrays, not single totals
+    if (Array.isArray(salesAmount) && Array.isArray(ordersCount)) {
+      return {
+        salesAmount: salesAmount.length === 12 ? salesAmount : [],
+        ordersCount: ordersCount.length === 12 ? ordersCount : [],
+      };
+    }
+    
+    // If single values, return empty arrays (chart will show empty)
+    // This prevents the GraphQL type error
     return {
-      salesAmount: Array.isArray(salesAmount) ? salesAmount : (salesAmount !== undefined ? [salesAmount] : []),
-      ordersCount: Array.isArray(ordersCount) ? ordersCount : (ordersCount !== undefined ? [ordersCount] : []),
+      salesAmount: [],
+      ordersCount: [],
     };
   }, [data, error]);
 

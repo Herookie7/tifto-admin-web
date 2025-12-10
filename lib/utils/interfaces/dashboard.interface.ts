@@ -119,9 +119,9 @@ interface IDashboardOrderSalesDetailsByPaymentMethodData {
 
 export interface IDashboardOrderSalesDetailsByPaymentMethodResponseGraphQL {
   getDashboardOrderSalesDetailsByPaymentMethod: {
-    all: IDashboardOrderSalesDetailsByPaymentMethodData[];
-    cod: IDashboardOrderSalesDetailsByPaymentMethodData[];
-    card: IDashboardOrderSalesDetailsByPaymentMethodData[];
+    all: IDashboardOrderSalesDetailsByPaymentMethodData;
+    cod: IDashboardOrderSalesDetailsByPaymentMethodData;
+    card: IDashboardOrderSalesDetailsByPaymentMethodData;
   };
 }
 

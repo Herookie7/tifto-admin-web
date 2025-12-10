@@ -1,0 +1,8 @@
+{
+  "query": "mutation ownerLogin($email: String!, $password: String!) { ownerLogin(email: $email, password: $password) { userId token email userType restaurants { _id orderId name image address } permissions userTypeId image name } }",
+  "variables": {
+    "email": "herookie@tensi.org",
+    "password": "9827453137"
+  }
+}
+

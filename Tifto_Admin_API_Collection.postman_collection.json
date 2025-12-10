@@ -1,0 +1,2840 @@
+{
+	"info": {
+		"_postman_id": "tifto-admin-api-collection",
+		"name": "Tifto Admin API - GraphQL",
+		"description": "Complete GraphQL API collection for Tifto Admin backend. Contains all 118 operations including queries, mutations, and subscriptions.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://tifto-backend.onrender.com",
+			"type": "string"
+		},
+		{
+			"key": "graphql_endpoint",
+			"value": "{{base_url}}/graphql",
+			"type": "string"
+		},
+		{
+			"key": "ws_endpoint",
+			"value": "wss://tifto-backend.onrender.com/graphql",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"description": "Authentication operations for admin/owner login",
+			"item": [
+				{
+					"name": "Owner Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.login && jsonData.data.login.token) {",
+									"        pm.collectionVariables.set('token', jsonData.data.login.token);",
+									"        console.log('Token saved to collection variable');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    userId\n    token\n    email\n    userType\n    restaurants {\n      _id\n      orderId\n      name\n      image\n      address\n    }\n    permissions\n    userTypeId\n    image\n    name\n  }\n}",
+								"variables": "{\n  \"email\": \"herookie@tensi.org\",\n  \"password\": \"9827453137\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Login mutation for admin/owner. Returns authentication token and user details. Token is automatically saved to collection variable."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard Queries",
+			"description": "Dashboard statistics and analytics queries",
+			"item": [
+				{
+					"name": "Get Dashboard Users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetDashboardUsers {\n  getDashboardUsers {\n    usersCount\n    vendorsCount\n    restaurantsCount\n    ridersCount\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get dashboard user counts (users, vendors, restaurants, riders)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Users By Year",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetDashboardUsersByYear($year: Int!) {\n  getDashboardUsersByYear(year: $year) {\n    usersCount\n    vendorsCount\n    restaurantsCount\n    ridersCount\n  }\n}",
+								"variables": "{\n  \"year\": 2024\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get dashboard user counts filtered by year"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Orders By Type",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetDashboardOrdersByType {\n  getDashboardOrdersByType {\n    value\n    label\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get dashboard orders grouped by type"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Sales By Type",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetDashboardSalesByType {\n  getDashboardSalesByType {\n    value\n    label\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get dashboard sales grouped by type"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Restaurant Dashboard Orders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetRestaurantDashboardOrdersSalesStats($restaurant: String!, $starting_date: String!, $ending_date: String!, $dateKeyword: String) {\n  getRestaurantDashboardOrdersSalesStats(restaurant: $restaurant, starting_date: $starting_date, ending_date: $ending_date, dateKeyword: $dateKeyword) {\n    totalOrders\n    totalSales\n    totalCODOrders\n    totalCardOrders\n  }\n}",
+								"variables": "{\n  \"restaurant\": \"restaurant_id\",\n  \"starting_date\": \"2024-01-01\",\n  \"ending_date\": \"2024-12-31\",\n  \"dateKeyword\": \"year\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get restaurant dashboard orders and sales statistics"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vendor Dashboard Stats",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetVendorDashboardStatsCardDetails($vendorId: String!, $dateKeyword: String, $starting_date: String!, $ending_date: String!) {\n  getVendorDashboardStatsCardDetails(vendorId: $vendorId, dateKeyword: $dateKeyword, starting_date: $starting_date, ending_date: $ending_date) {\n    totalRestaurants\n    totalOrders\n    totalSales\n    totalDeliveries\n  }\n}",
+								"variables": "{\n  \"vendorId\": \"vendor_id\",\n  \"dateKeyword\": \"year\",\n  \"starting_date\": \"2024-01-01\",\n  \"ending_date\": \"2024-12-31\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get vendor dashboard statistics card details"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vendor Live Monitor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query GetLiveMonitorData($id: String!, $dateKeyword: String, $starting_date: String, $ending_date: String) {\n  getLiveMonitorData(id: $id, dateKeyword: $dateKeyword, starting_date: $starting_date, ending_date: $ending_date) {\n    online_stores\n    cancelled_orders\n    delayed_orders\n    ratings\n  }\n}",
+								"variables": "{\n  \"id\": \"vendor_id\",\n  \"dateKeyword\": \"today\",\n  \"starting_date\": \"2024-01-01\",\n  \"ending_date\": \"2024-12-31\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get vendor live monitor data"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User Management",
+			"description": "User management operations - queries and mutations for user data",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query users {\n  users {\n    _id\n    name\n    email\n    phone\n    createdAt\n    userType\n    status\n    lastLogin\n    notes\n    addresses {\n      location {\n        coordinates\n      }\n      deliveryAddress\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all users with their details"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query user($userId: String!) {\n  user(userId: $userId) {\n    _id\n    name\n    email\n    phone\n    createdAt\n    userType\n    status\n    lastLogin\n    notes\n    addresses {\n      location {\n        coordinates\n      }\n      deliveryAddress\n    }\n  }\n}",
+								"variables": "{\n  \"userId\": \"user_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get user details by user ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateUserStatus($id: String!, $status: String!) {\n  updateUserStatus(id: $id, status: $status) {\n    _id\n    status\n  }\n}",
+								"variables": "{\n  \"id\": \"user_id\",\n  \"status\": \"active\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update user status (active/inactive)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Notes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateUserNotes($id: String!, $notes: String!) {\n  updateUserNotes(id: $id, notes: $notes) {\n    _id\n    notes\n  }\n}",
+								"variables": "{\n  \"id\": \"user_id\",\n  \"notes\": \"User notes here\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update user notes"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteUser($id: String!) {\n  deleteUser(id: $id) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"user_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete a user by ID"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vendor Management",
+			"description": "Vendor management operations - queries and mutations for vendor data",
+			"item": [
+				{
+					"name": "Get All Vendors",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query vendors {\n  vendors {\n    _id\n    name\n    email\n    phone\n    address\n    createdAt\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all vendors"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vendor By ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query vendor($id: String!) {\n  vendor(id: $id) {\n    _id\n    name\n    email\n    phone\n    address\n    createdAt\n  }\n}",
+								"variables": "{\n  \"id\": \"vendor_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get vendor details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vendor With Restaurants",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query vendorWithRestaurants($id: String!) {\n  vendorWithRestaurants(id: $id) {\n    _id\n    name\n    email\n    restaurants {\n      _id\n      name\n      address\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"vendor_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get vendor with associated restaurants"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Vendor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createVendor($vendor: VendorInput!) {\n  createVendor(vendor: $vendor) {\n    _id\n    name\n    email\n    phone\n    address\n  }\n}",
+								"variables": "{\n  \"vendor\": {\n    \"name\": \"Vendor Name\",\n    \"email\": \"vendor@example.com\",\n    \"phone\": \"1234567890\",\n    \"address\": \"Vendor Address\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create a new vendor"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Vendor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteVendor($id: String!) {\n  deleteVendor(id: $id) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"vendor_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete a vendor by ID"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Restaurant Management",
+			"description": "Restaurant management operations - queries and mutations for restaurant data",
+			"item": [
+				{
+					"name": "Get All Restaurants",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query restaurants {\n  restaurants {\n    _id\n    name\n    address\n    phone\n    image\n    orderId\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all restaurants"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Restaurants Paginated",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query restaurantsPaginated($page: Int, $limit: Int, $search: String) {\n  restaurantsPaginated(page: $page, limit: $limit, search: $search) {\n    restaurants {\n      _id\n      name\n      address\n    }\n    totalCount\n  }\n}",
+								"variables": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"search\": \"\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get restaurants with pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Restaurants By Owner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query restaurantsByOwner($owner: String!) {\n  restaurantsByOwner(owner: $owner) {\n    _id\n    name\n    address\n    phone\n  }\n}",
+								"variables": "{\n  \"owner\": \"owner_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get restaurants by owner ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Restaurant Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query restaurantProfile($id: String!) {\n  restaurantProfile(id: $id) {\n    _id\n    name\n    address\n    phone\n    image\n    deliveryTime\n    minimumOrder\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get restaurant profile by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cloned Restaurants",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query clonedRestaurants {\n  clonedRestaurants {\n    _id\n    name\n    address\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get cloned restaurants"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Restaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createRestaurant($restaurant: RestaurantInput!, $owner: String!) {\n  createRestaurant(restaurant: $restaurant, owner: $owner) {\n    _id\n    name\n    address\n    phone\n  }\n}",
+								"variables": "{\n  \"restaurant\": {\n    \"name\": \"Restaurant Name\",\n    \"address\": \"Restaurant Address\",\n    \"phone\": \"1234567890\",\n    \"deliveryTime\": 30,\n    \"minimumOrder\": 10.00\n  },\n  \"owner\": \"owner_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create a new restaurant"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Restaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteRestaurant($id: String!) {\n  deleteRestaurant(id: $id) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete a restaurant by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Restaurant Delivery Bounds",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateDeliveryBoundsAndLocation($id: String!, $location: LocationInput, $bounds: GeoJSONInput) {\n  updateDeliveryBoundsAndLocation(id: $id, location: $location, bounds: $bounds) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_id\",\n  \"location\": {\n    \"coordinates\": [0.0, 0.0]\n  },\n  \"bounds\": {\n    \"type\": \"Polygon\",\n    \"coordinates\": [[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]]]\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update restaurant delivery bounds and location"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Restaurant Delivery Info",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateRestaurantDelivery($id: String!, $deliveryDistance: Float, $deliveryFeePerKm: Float, $minDeliveryFee: Float) {\n  updateRestaurantDelivery(id: $id, deliveryDistance: $deliveryDistance, deliveryFeePerKm: $deliveryFeePerKm, minDeliveryFee: $minDeliveryFee) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_id\",\n  \"deliveryDistance\": 5,\n  \"deliveryFeePerKm\": 2.5,\n  \"minDeliveryFee\": 5.00\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update restaurant delivery information"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Restaurant Business Details",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateRestaurantBussinessDetails($id: String!, $businessDetails: BusinessDetailsInput!) {\n  updateRestaurantBussinessDetails(id: $id, businessDetails: $businessDetails) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_id\",\n  \"businessDetails\": {\n    \"businessName\": \"Business Name\",\n    \"registrationNumber\": \"REG123\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update restaurant business details"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Food Out of Stock",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateFoodOutOfStock($id: String!, $outOfStock: Boolean!) {\n  updateFoodOutOfStock(id: $id, outOfStock: $outOfStock) {\n    _id\n    title\n    outOfStock\n  }\n}",
+								"variables": "{\n  \"id\": \"food_id\",\n  \"outOfStock\": true\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update food item out of stock status"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order Management",
+			"description": "Order management operations - queries and mutations for order data",
+			"item": [
+				{
+					"name": "Get All Orders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query allOrders($page: Int) {\n  allOrders(page: $page) {\n    orders {\n      _id\n      orderId\n      orderStatus\n      totalAmount\n    }\n    totalCount\n  }\n}",
+								"variables": "{\n  \"page\": 1\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all orders with pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Orders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getActiveOrders($restaurantId: String!, $page: Int, $rowsPerPage: Int, $actions: [String!], $search: String) {\n  getActiveOrders(restaurantId: $restaurantId, page: $page, rowsPerPage: $rowsPerPage, actions: $actions, search: $search) {\n    orders {\n      _id\n      orderId\n      orderStatus\n    }\n    totalCount\n  }\n}",
+								"variables": "{\n  \"restaurantId\": \"restaurant_id\",\n  \"page\": 1,\n  \"rowsPerPage\": 10,\n  \"actions\": [\"PENDING\", \"ACCEPTED\"],\n  \"search\": \"\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get active orders for a restaurant"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders By Restaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ordersByRestId($restaurant: String!, $page: Int, $rows: Int, $search: String) {\n  ordersByRestId(restaurant: $restaurant, page: $page, rows: $rows, search: $search) {\n    orders {\n      _id\n      orderId\n      orderStatus\n    }\n    totalCount\n  }\n}",
+								"variables": "{\n  \"restaurant\": \"restaurant_id\",\n  \"page\": 1,\n  \"rows\": 10,\n  \"search\": \"\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get orders by restaurant ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders By User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ordersByUser($userId: String!, $page: Int, $limit: Int) {\n  ordersByUser(userId: $userId, page: $page, limit: $limit) {\n    orders {\n      _id\n      orderId\n      orderStatus\n    }\n    totalCount\n  }\n}",
+								"variables": "{\n  \"userId\": \"user_id\",\n  \"page\": 1,\n  \"limit\": 10\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get orders by user ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateStatus($id: String!, $orderStatus: String!) {\n  updateStatus(id: $id, orderStatus: $orderStatus) {\n    _id\n    orderId\n    orderStatus\n  }\n}",
+								"variables": "{\n  \"id\": \"order_id\",\n  \"orderStatus\": \"ACCEPTED\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update order status"
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Rider to Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation assignRider($id: String!, $riderId: String!) {\n  assignRider(id: $id, riderId: $riderId) {\n    _id\n    orderId\n    rider {\n      _id\n      name\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"order_id\",\n  \"riderId\": \"rider_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Assign a rider to an order"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Food & Category Management",
+			"description": "Food, category, subcategory, addon, and option management operations",
+			"item": [
+				{
+					"name": "Get Foods By Restaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query foodsByRestaurantId($restaurantId: String!) {\n  foodsByRestaurantId(restaurantId: $restaurantId) {\n    _id\n    title\n    description\n    price\n    category\n  }\n}",
+								"variables": "{\n  \"restaurantId\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all foods by restaurant ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Food",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createFood($food: FoodInput!) {\n  createFood(food: $food) {\n    _id\n    title\n    description\n    price\n  }\n}",
+								"variables": "{\n  \"food\": {\n    \"title\": \"Food Name\",\n    \"description\": \"Food Description\",\n    \"category\": \"category_id\",\n    \"restaurant\": \"restaurant_id\",\n    \"price\": 15.99\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create a new food item"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Food",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteFood($id: String!) {\n  deleteFood(id: $id) {\n    _id\n    title\n  }\n}",
+								"variables": "{\n  \"id\": \"food_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete a food item by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Categories By Restaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query categoriesByRestaurantId($restaurantId: String!) {\n  categoriesByRestaurantId(restaurantId: $restaurantId) {\n    _id\n    title\n    image\n    restaurant\n  }\n}",
+								"variables": "{\n  \"restaurantId\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all categories by restaurant ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createCategory($category: CategoryInput!) {\n  createCategory(category: $category) {\n    _id\n    title\n    image\n  }\n}",
+								"variables": "{\n  \"category\": {\n    \"title\": \"Category Name\",\n    \"restaurant\": \"restaurant_id\",\n    \"image\": \"image_url\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create a new category"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteCategory($id: String!) {\n  deleteCategory(id: $id) {\n    _id\n    title\n  }\n}",
+								"variables": "{\n  \"id\": \"category_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete a category by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subcategories",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query subcategories {\n  subcategories {\n    _id\n    title\n    parent\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all subcategories"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subcategory By ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query subcategory($id: String!) {\n  subcategory(id: $id) {\n    _id\n    title\n    parent\n  }\n}",
+								"variables": "{\n  \"id\": \"subcategory_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get subcategory by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subcategories By Parent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query subcategoriesByParentId($parentId: String!) {\n  subcategoriesByParentId(parentId: $parentId) {\n    _id\n    title\n    parent\n  }\n}",
+								"variables": "{\n  \"parentId\": \"category_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get subcategories by parent category ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Subcategories",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createSubCategories($subCategories: [SubCategoryInput!]!) {\n  createSubCategories(subCategories: $subCategories) {\n    _id\n    title\n    parent\n  }\n}",
+								"variables": "{\n  \"subCategories\": [\n    {\n      \"title\": \"Subcategory 1\",\n      \"parent\": \"category_id\"\n    }\n  ]\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create subcategories"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Subcategory",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteSubCategory($id: String!) {\n  deleteSubCategory(id: $id) {\n    _id\n    title\n  }\n}",
+								"variables": "{\n  \"id\": \"subcategory_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete a subcategory by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Addons By Restaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query addonsByRestaurantId($restaurantId: String!) {\n  addonsByRestaurantId(restaurantId: $restaurantId) {\n    _id\n    title\n    restaurant\n    options {\n      title\n      price\n    }\n  }\n}",
+								"variables": "{\n  \"restaurantId\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all addons by restaurant ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Addons",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createAddons($addons: [AddonInput!]!) {\n  createAddons(addons: $addons) {\n    _id\n    title\n    restaurant\n  }\n}",
+								"variables": "{\n  \"addons\": [\n    {\n      \"title\": \"Addon Name\",\n      \"restaurant\": \"restaurant_id\",\n      \"options\": [\n        {\n          \"title\": \"Option 1\",\n          \"price\": 2.00\n        }\n      ]\n    }\n  ]\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create addons"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Addon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteAddon($id: String!) {\n  deleteAddon(id: $id) {\n    _id\n    title\n  }\n}",
+								"variables": "{\n  \"id\": \"addon_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete an addon by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Options By Restaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query optionsByRestaurantId($restaurantId: String!) {\n  optionsByRestaurantId(restaurantId: $restaurantId) {\n    _id\n    title\n    restaurant\n  }\n}",
+								"variables": "{\n  \"restaurantId\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all options by restaurant ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Options",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createOptions($options: [OptionInput!]!) {\n  createOptions(options: $options) {\n    _id\n    title\n    restaurant\n  }\n}",
+								"variables": "{\n  \"options\": [\n    {\n      \"title\": \"Option Name\",\n      \"restaurant\": \"restaurant_id\"\n    }\n  ]\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create options"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Option",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteOption($id: String!) {\n  deleteOption(id: $id) {\n    _id\n    title\n  }\n}",
+								"variables": "{\n  \"id\": \"option_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete an option by ID"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Rider Management",
+			"description": "Rider management operations - queries and mutations for rider data",
+			"item": [
+				{
+					"name": "Get All Riders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query riders {\n  riders {\n    _id\n    name\n    username\n    phone\n    email\n    zone\n    status\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all riders"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Rider By ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query rider($id: String!) {\n  rider(id: $id) {\n    _id\n    name\n    username\n    phone\n    email\n    zone\n    status\n  }\n}",
+								"variables": "{\n  \"id\": \"rider_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get rider details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Available Riders",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query availableRiders {\n  availableRiders {\n    _id\n    name\n    username\n    status\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all available riders"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Riders By Zone",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ridersByZone($zone: String!) {\n  ridersByZone(zone: $zone) {\n    _id\n    name\n    username\n    zone\n  }\n}",
+								"variables": "{\n  \"zone\": \"zone_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get riders by zone ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Rider",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createRider($rider: RiderInput!) {\n  createRider(rider: $rider) {\n    _id\n    name\n    username\n    phone\n    email\n    zone\n  }\n}",
+								"variables": "{\n  \"rider\": {\n    \"name\": \"Rider Name\",\n    \"username\": \"rider_username\",\n    \"phone\": \"1234567890\",\n    \"email\": \"rider@example.com\",\n    \"zone\": \"zone_id\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create a new rider"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Rider",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteRider($id: String!) {\n  deleteRider(id: $id) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"rider_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Delete a rider by ID"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Configuration",
+			"description": "System configuration operations - email, payment, Firebase, and other settings",
+			"item": [
+				{
+					"name": "Get Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query getConfiguration {\n  configuration {\n    _id\n    email\n    emailName\n    currency\n    currencySymbol\n    deliveryRate\n    googleApiKey\n    firebaseKey\n    authDomain\n    projectId\n    storageBucket\n    msgSenderId\n    appId\n    measurementId\n    vapidKey\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get system configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Email Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation saveEmailConfiguration($configurationInput: ConfigurationInput!) {\n  saveEmailConfiguration(configurationInput: $configurationInput) {\n    _id\n    email\n    emailName\n  }\n}",
+								"variables": "{\n  \"configurationInput\": {\n    \"email\": \"noreply@example.com\",\n    \"emailName\": \"Tifto Admin\",\n    \"password\": \"email_password\",\n    \"enableEmail\": true\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Save email configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Stripe Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation saveStripeConfiguration($configurationInput: ConfigurationInput!) {\n  saveStripeConfiguration(configurationInput: $configurationInput) {\n    _id\n  }\n}",
+								"variables": "{\n  \"configurationInput\": {\n    \"publishableKey\": \"pk_test_\",\n    \"secretKey\": \"sk_test_\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Save Stripe payment configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Save PayPal Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation savePayPalConfiguration($configurationInput: ConfigurationInput!) {\n  savePayPalConfiguration(configurationInput: $configurationInput) {\n    _id\n  }\n}",
+								"variables": "{\n  \"configurationInput\": {\n    \"clientId\": \"paypal_client_id\",\n    \"clientSecret\": \"paypal_secret\",\n    \"sandbox\": true\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Save PayPal payment configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Firebase Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation saveFirebaseConfiguration($configurationInput: ConfigurationInput!) {\n  saveFirebaseConfiguration(configurationInput: $configurationInput) {\n    _id\n    firebaseKey\n    authDomain\n    projectId\n  }\n}",
+								"variables": "{\n  \"configurationInput\": {\n    \"firebaseKey\": \"AIza\",\n    \"authDomain\": \"project.firebaseapp.com\",\n    \"projectId\": \"project_id\",\n    \"storageBucket\": \"project.appspot.com\",\n    \"msgSenderId\": \"123456789\",\n    \"appId\": \"1:123456789:web:abc123\",\n    \"measurementId\": \"G-XXXXXXXXXX\",\n    \"vapidKey\": \"vapid_key\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Save Firebase configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Google API Key",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation saveGoogleApiKey($configurationInput: ConfigurationInput!) {\n  saveGoogleApiKey(configurationInput: $configurationInput) {\n    _id\n    googleApiKey\n  }\n}",
+								"variables": "{\n  \"configurationInput\": {\n    \"googleApiKey\": \"AIza\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Save Google API key"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Currency Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation saveCurrencyConfiguration($configurationInput: ConfigurationInput!) {\n  saveCurrencyConfiguration(configurationInput: $configurationInput) {\n    _id\n    currency\n    currencySymbol\n  }\n}",
+								"variables": "{\n  \"configurationInput\": {\n    \"currency\": \"USD\",\n    \"currencySymbol\": \"$\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Save currency configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Delivery Rate Configuration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation saveDeliveryRateConfiguration($configurationInput: ConfigurationInput!) {\n  saveDeliveryRateConfiguration(configurationInput: $configurationInput) {\n    _id\n    deliveryRate\n  }\n}",
+								"variables": "{\n  \"configurationInput\": {\n    \"deliveryRate\": 2.5,\n    \"costType\": \"perKM\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Save delivery rate configuration"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"description": "Notification management operations",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query notifications {\n  notifications {\n    _id\n    title\n    body\n    screen\n    createdAt\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Web Notifications",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query webNotifications {\n  webNotifications {\n    _id\n    title\n    body\n    screen\n    createdAt\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get web notifications"
+					},
+					"response": []
+				},
+				{
+					"name": "Send Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation sendNotification($notification: NotificationInput!) {\n  sendNotification(notification: $notification) {\n    _id\n    title\n    body\n    screen\n  }\n}",
+								"variables": "{\n  \"notification\": {\n    \"title\": \"Notification Title\",\n    \"body\": \"Notification Body\",\n    \"screen\": \"orders\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Send a notification"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Support Tickets",
+			"description": "Support ticket management operations",
+			"item": [
+				{
+					"name": "Get Ticket Users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ticketUsers {\n  ticketUsers {\n    _id\n    name\n    email\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all ticket users"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ticket Users With Latest",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ticketUsersWithLatest {\n  ticketUsersWithLatest {\n    _id\n    name\n    email\n    latestTicket {\n      _id\n      subject\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get ticket users with their latest ticket"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Support Tickets",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query userSupportTickets($userId: String!) {\n  userSupportTickets(userId: $userId) {\n    _id\n    subject\n    status\n    createdAt\n  }\n}",
+								"variables": "{\n  \"userId\": \"user_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get support tickets for a user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Support Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query singleSupportTicket($ticketId: String!) {\n  singleSupportTicket(ticketId: $ticketId) {\n    _id\n    subject\n    status\n    user {\n      _id\n      name\n    }\n    createdAt\n  }\n}",
+								"variables": "{\n  \"ticketId\": \"ticket_id\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get a single support ticket by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ticket Messages",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query ticketMessages($input: TicketMessagesInput!) {\n  ticketMessages(input: $input) {\n    messages {\n      _id\n      message\n      isAdmin\n      createdAt\n    }\n    totalCount\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"ticket\": \"ticket_id\",\n    \"page\": 1,\n    \"limit\": 50\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get messages for a ticket"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Support Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createSupportTicket($input: SupportTicketInput!) {\n  createSupportTicket(input: $input) {\n    _id\n    subject\n    status\n    user {\n      _id\n      name\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"user\": \"user_id\",\n    \"subject\": \"Ticket Subject\",\n    \"message\": \"Ticket Message\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create a new support ticket"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Ticket Message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createTicketMessage($input: TicketMessageInput!) {\n  createTicketMessage(input: $input) {\n    _id\n    message\n    isAdmin\n    createdAt\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"ticket\": \"ticket_id\",\n    \"message\": \"Message content\",\n    \"isAdmin\": true\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create a message in a support ticket"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ticket Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateTicketStatus($input: UpdateTicketStatusInput!) {\n  updateTicketStatus(input: $input) {\n    _id\n    status\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"ticketId\": \"ticket_id\",\n    \"status\": \"RESOLVED\"\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update support ticket status"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Financial",
+			"description": "Financial operations - withdraw requests, earnings, transactions, tipping, and commission",
+			"item": [
+				{
+					"name": "Get All Withdraw Requests",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query allWithdrawRequests {\n  allWithdrawRequests {\n    _id\n    vendor {\n      _id\n      name\n    }\n    amount\n    status\n    createdAt\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get all withdraw requests"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Withdraw Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateWithdrawRequest($id: String!, $status: String!) {\n  updateWithdrawRequest(id: $id, status: $status) {\n    _id\n    status\n  }\n}",
+								"variables": "{\n  \"id\": \"request_id\",\n  \"status\": \"TRANSFERRED\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update withdraw request status"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Withdraw Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createWithdrawRequest($input: WithdrawRequestInput!) {\n  createWithdrawRequest(input: $input) {\n    _id\n    vendor {\n      _id\n      name\n    }\n    amount\n    status\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"vendor\": \"vendor_id\",\n    \"amount\": 1000.00\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create a new withdraw request"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Earnings",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query earning($vendorId: String!, $starting_date: String!, $ending_date: String!) {\n  earning(vendorId: $vendorId, starting_date: $starting_date, ending_date: $ending_date) {\n    totalEarnings\n    totalOrders\n    totalSales\n  }\n}",
+								"variables": "{\n  \"vendorId\": \"vendor_id\",\n  \"starting_date\": \"2024-01-01\",\n  \"ending_date\": \"2024-12-31\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get earnings for a vendor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Earnings For Store",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query earningForStore($restaurantId: String!, $starting_date: String!, $ending_date: String!) {\n  earningForStore(restaurantId: $restaurantId, starting_date: $starting_date, ending_date: $ending_date) {\n    totalEarnings\n    totalOrders\n    totalSales\n  }\n}",
+								"variables": "{\n  \"restaurantId\": \"restaurant_id\",\n  \"starting_date\": \"2024-01-01\",\n  \"ending_date\": \"2024-12-31\"\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get earnings for a restaurant/store"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction History",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query transactionHistory($vendorId: String!, $page: Int, $limit: Int) {\n  transactionHistory(vendorId: $vendorId, page: $page, limit: $limit) {\n    transactions {\n      _id\n      amount\n      type\n      createdAt\n    }\n    totalCount\n  }\n}",
+								"variables": "{\n  \"vendorId\": \"vendor_id\",\n  \"page\": 1,\n  \"limit\": 10\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get transaction history for a vendor"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tipping",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query tipping {\n  tipping {\n    _id\n    tip1\n    tip2\n    tip3\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Get tipping configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Tipping",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createTipping($tipping: TippingInput!) {\n  createTipping(tipping: $tipping) {\n    _id\n    tip1\n    tip2\n    tip3\n  }\n}",
+								"variables": "{\n  \"tipping\": {\n    \"tip1\": 10,\n    \"tip2\": 20,\n    \"tip3\": 30\n  }\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Create or update tipping configuration"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Commission Rate",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateCommissionRate($id: String!, $commissionRate: Float!) {\n  updateCommissionRate(id: $id, commissionRate: $commissionRate) {\n    _id\n    name\n    commissionRate\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_id\",\n  \"commissionRate\": 15.5\n}"
+							}
+						},
+						"url": {
+							"raw": "{{graphql_endpoint}}",
+							"host": ["{{graphql_endpoint}}"]
+						},
+						"description": "Update commission rate for a restaurant"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Other Features",
+			"description": "Additional features - zones, banners, cuisines, shop types, coupons, reviews, staff, timings, delivery options, tokens, app versions, and audit logs",
+			"item": [
+				{
+					"name": "Get Zones",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query zones {\n  zones {\n    _id\n    name\n    bounds\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get all zones"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Zone",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createZone($zone: ZoneInput!) {\n  createZone(zone: $zone) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"zone\": {\n    \"name\": \"Zone Name\",\n    \"bounds\": {\n      \"type\": \"Polygon\",\n      \"coordinates\": [[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [0.0, 0.0]]]\n    }\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Create a new zone"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Zone",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteZone($id: String!) {\n  deleteZone(id: $id) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"zone_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Delete a zone by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Banners",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query banners {\n  banners {\n    _id\n    title\n    image\n    screen\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get all banners"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Banner",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createBanner($banner: BannerInput!) {\n  createBanner(banner: $banner) {\n    _id\n    title\n    image\n    screen\n  }\n}",
+								"variables": "{\n  \"banner\": {\n    \"title\": \"Banner Title\",\n    \"image\": \"image_url\",\n    \"screen\": \"home\"\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Create a new banner"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Banner",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteBanner($id: String!) {\n  deleteBanner(id: $id) {\n    _id\n    title\n  }\n}",
+								"variables": "{\n  \"id\": \"banner_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Delete a banner by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cuisines",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query cuisines {\n  cuisines {\n    _id\n    name\n    image\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get all cuisines"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Cuisine",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createCuisine($cuisine: CuisineInput!) {\n  createCuisine(cuisine: $cuisine) {\n    _id\n    name\n    image\n  }\n}",
+								"variables": "{\n  \"cuisine\": {\n    \"name\": \"Italian\",\n    \"image\": \"image_url\"\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Create a new cuisine"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cuisine",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteCuisine($id: String!) {\n  deleteCuisine(id: $id) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"cuisine_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Delete a cuisine by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Shop Types",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query shopTypes {\n  shopTypes {\n    _id\n    name\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get all shop types"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Shop Type",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createShopType($shopType: ShopTypeInput!) {\n  createShopType(shopType: $shopType) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"shopType\": {\n    \"name\": \"Restaurant\"\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Create a new shop type"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Shop Type",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateShopType($id: String!, $shopType: ShopTypeInput!) {\n  updateShopType(id: $id, shopType: $shopType) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"shop_type_id\",\n  \"shopType\": {\n    \"name\": \"Updated Name\"\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Update a shop type"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Shop Type",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteShopType($id: String!) {\n  deleteShopType(id: $id) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"shop_type_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Delete a shop type by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Coupons",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query coupons {\n  coupons {\n    _id\n    code\n    discount\n    discountType\n    maxDiscount\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get all coupons"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Coupon",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createCoupon($coupon: CouponInput!) {\n  createCoupon(coupon: $coupon) {\n    _id\n    code\n    discount\n  }\n}",
+								"variables": "{\n  \"coupon\": {\n    \"code\": \"SAVE20\",\n    \"discount\": 20,\n    \"discountType\": \"percentage\",\n    \"maxDiscount\": 50.00\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Create a new coupon"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Coupon",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteCoupon($id: String!) {\n  deleteCoupon(id: $id) {\n    _id\n    code\n  }\n}",
+								"variables": "{\n  \"id\": \"coupon_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Delete a coupon by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Restaurant Coupons",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query restaurantCoupons($restaurantId: String!) {\n  restaurantCoupons(restaurantId: $restaurantId) {\n    _id\n    restaurant {\n      _id\n      name\n    }\n    coupon {\n      _id\n      code\n    }\n  }\n}",
+								"variables": "{\n  \"restaurantId\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get coupons for a restaurant"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Restaurant Coupon",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createRestaurantCoupon($input: RestaurantCouponInput!) {\n  createRestaurantCoupon(input: $input) {\n    _id\n    restaurant {\n      _id\n      name\n    }\n    coupon {\n      _id\n      code\n    }\n  }\n}",
+								"variables": "{\n  \"input\": {\n    \"restaurant\": \"restaurant_id\",\n    \"coupon\": \"coupon_id\"\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Create a restaurant coupon association"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Restaurant Coupon",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteRestaurantCoupon($id: String!) {\n  deleteRestaurantCoupon(id: $id) {\n    _id\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_coupon_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Delete a restaurant coupon association"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reviews/Ratings",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query reviewsByRestaurant($restaurantId: String!) {\n  reviewsByRestaurant(restaurantId: $restaurantId) {\n    _id\n    rating\n    comment\n    user {\n      _id\n      name\n    }\n    createdAt\n  }\n}",
+								"variables": "{\n  \"restaurantId\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get reviews/ratings for a restaurant"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Staff",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query staffs {\n  staffs {\n    _id\n    name\n    email\n    restaurant {\n      _id\n      name\n    }\n    permissions\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get all staff members"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Staff",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createStaff($staff: StaffInput!) {\n  createStaff(staff: $staff) {\n    _id\n    name\n    email\n    restaurant {\n      _id\n      name\n    }\n    permissions\n  }\n}",
+								"variables": "{\n  \"staff\": {\n    \"name\": \"Staff Name\",\n    \"email\": \"staff@example.com\",\n    \"restaurant\": \"restaurant_id\",\n    \"permissions\": [\"orders\", \"food\"]\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Create a new staff member"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Staff",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation deleteStaff($id: String!) {\n  deleteStaff(id: $id) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"staff_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Delete a staff member by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Timings",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateTimings($id: String!, $timings: [TimingInput!]!) {\n  updateTimings(id: $id, timings: $timings) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_id\",\n  \"timings\": [\n    {\n      \"day\": \"Monday\",\n      \"openTime\": \"09:00\",\n      \"closeTime\": \"22:00\",\n      \"isOpen\": true\n    }\n  ]\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Update restaurant timings"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Delivery Options",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation updateDeliveryOptions($id: String!, $deliveryOptions: DeliveryOptionsInput!) {\n  updateDeliveryOptions(id: $id, deliveryOptions: $deliveryOptions) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"restaurant_id\",\n  \"deliveryOptions\": {\n    \"allowDelivery\": true,\n    \"allowPickup\": true,\n    \"scheduleOrder\": false\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Update restaurant delivery options"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Token",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation uploadToken($id: String!, $pushToken: String!) {\n  uploadToken(id: $id, pushToken: $pushToken) {\n    _id\n    name\n  }\n}",
+								"variables": "{\n  \"id\": \"user_id\",\n  \"pushToken\": \"firebase_push_token\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Upload push notification token for a user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get App Versions",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query versions {\n  versions {\n    _id\n    platform\n    version\n    forceUpdate\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get all app versions"
+					},
+					"response": []
+				},
+				{
+					"name": "Create/Update App Version",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation createAppVersion($version: AppVersionInput!) {\n  createAppVersion(version: $version) {\n    _id\n    platform\n    version\n    forceUpdate\n  }\n}",
+								"variables": "{\n  \"version\": {\n    \"platform\": \"android\",\n    \"version\": \"1.0.0\",\n    \"forceUpdate\": false\n  }\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Create or update app version"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query auditLogs($page: Int, $limit: Int, $search: String) {\n  auditLogs(page: $page, limit: $limit, search: $search) {\n    logs {\n      _id\n      action\n      user\n      createdAt\n    }\n    totalCount\n  }\n}",
+								"variables": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"search\": \"\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Get audit logs with pagination"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Subscriptions",
+			"description": "GraphQL subscriptions for real-time updates. Note: These require WebSocket connection at {{ws_endpoint}}. For testing subscriptions, use a WebSocket client or GraphQL Playground.",
+			"item": [
+				{
+					"name": "Subscribe Place Order",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "subscription SubscribePlaceOrder($restaurant: String!) {\n  subscribePlaceOrder(restaurant: $restaurant) {\n    userId\n    origin\n    order {\n      _id\n      orderId\n      orderStatus\n      restaurant {\n        _id\n        name\n      }\n    }\n  }\n}",
+								"variables": "{\n  \"restaurant\": \"restaurant_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Subscribe to new orders for a restaurant. Requires WebSocket connection at {{ws_endpoint}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Subscription Order",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "subscription SubscriptionOrder($id: String!) {\n  subscriptionOrder(id: $id) {\n    _id\n    orderId\n    orderStatus\n    restaurant {\n      _id\n      name\n    }\n  }\n}",
+								"variables": "{\n  \"id\": \"order_id\"\n}"
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Subscribe to order updates. Requires WebSocket connection at {{ws_endpoint}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Rider Updated Subscription",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "subscription RiderUpdated {\n  riderUpdated {\n    _id\n    name\n    status\n    location {\n      coordinates\n    }\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": {"raw": "{{graphql_endpoint}}", "host": ["{{graphql_endpoint}}"]},
+						"description": "Subscribe to rider updates. Requires WebSocket connection at {{ws_endpoint}}"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
