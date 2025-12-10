@@ -33,7 +33,7 @@ export default function UserStats({
   // COntext
   const { CURRENCY_CODE } = useConfiguration();
 
-  const { data, loading } = useQueryGQL(
+  const { data, loading, error } = useQueryGQL(
     GET_DASHBOARD_RESTAURANT_ORDERS,
     {
       restaurant: restaurantId,
@@ -44,6 +44,12 @@ export default function UserStats({
     {
       fetchPolicy: 'network-only',
       debounceMs: 300,
+      onError: (err) => {
+        // Silently handle missing query errors - backend may not have this query deployed
+        if (err.message?.includes('Cannot query field')) {
+          console.warn('Dashboard query not available in backend:', err.message);
+        }
+      },
     }
   ) as IQueryResult<
     IDashboardRestaurantOrdersSalesStatsResponseGraphQL | undefined,

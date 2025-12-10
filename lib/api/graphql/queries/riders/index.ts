@@ -38,9 +38,6 @@ export const GET_RIDER = gql`
         accountName
         accountCode
         accountNumber
-        bussinessRegNo
-        companyRegNo
-        taxRate
       }
       licenseDetails {
         number

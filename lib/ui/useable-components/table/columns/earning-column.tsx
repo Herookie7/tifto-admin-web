@@ -1,6 +1,8 @@
 import { IActionMenuProps } from '@/lib/utils/interfaces';
 import { IEarning } from '@/lib/utils/interfaces';
 import { useTranslations } from 'next-intl';
+import { useConfiguration } from '@/lib/hooks/useConfiguration';
+import { formatNumberWithCurrency } from '@/lib/utils/methods/currency';
 
 export const EARNING_COLUMNS = ({
   isSuperAdmin = false,
@@ -10,6 +12,9 @@ export const EARNING_COLUMNS = ({
 }) => {
   // Hooks
   const t = useTranslations();
+  const { CURRENCY_CODE, CURRENT_SYMBOL } = useConfiguration();
+  const currencySymbol = CURRENT_SYMBOL || '₹';
+  const currencyCode = CURRENCY_CODE || 'INR';
 
   console.log({ isSuperAdmin });
 
@@ -45,7 +50,7 @@ export const EARNING_COLUMNS = ({
       hidden: !isSuperAdmin,
       body: (earning: IEarning) =>
         isSuperAdmin ? (
-          <div>${earning?.platformEarnings?.totalEarnings?.toFixed(2)}</div>
+          <div>{formatNumberWithCurrency(earning?.platformEarnings?.totalEarnings || 0, currencyCode)}</div>
         ) : (
           <span>-</span>
         ),
@@ -62,7 +67,7 @@ export const EARNING_COLUMNS = ({
       propertyName: 'storeEarnings.totalEarnings.',
 
       body: (earning: IEarning) => (
-        <div>${earning?.storeEarnings?.totalEarnings?.toFixed(2)}</div>
+        <div>{formatNumberWithCurrency(earning?.storeEarnings?.totalEarnings || 0, currencyCode)}</div>
       ),
     },
     {
@@ -78,7 +83,7 @@ export const EARNING_COLUMNS = ({
       propertyName: 'riderEarnings.totalEarnings',
       hidden: !isSuperAdmin,
       body: (earning: IEarning) => (
-        <div>${earning?.riderEarnings?.totalEarnings?.toFixed(2)}</div>
+        <div>{formatNumberWithCurrency(earning?.riderEarnings?.totalEarnings || 0, currencyCode)}</div>
       ),
     },
   ];

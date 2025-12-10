@@ -29,7 +29,7 @@ export default function GrowthOverView() {
   const [chartOptions, setChartOptions] = useState({});
 
   // Query
-  const { data, loading } = useQueryGQL(
+  const { data, loading, error } = useQueryGQL(
     GET_DASHBOARD_RESTAURANT_SALES_ORDER_COUNT_DETAILS_BY_YEAR,
     {
       restaurant: restaurantId,
@@ -39,6 +39,12 @@ export default function GrowthOverView() {
       fetchPolicy: 'network-only',
       enabled: !!restaurantId,
       debounceMs: 300,
+      onError: (err) => {
+        // Silently handle missing query errors - backend may not have this query deployed
+        if (err.message?.includes('Cannot query field')) {
+          console.warn('Dashboard query not available in backend:', err.message);
+        }
+      },
     }
   ) as IQueryResult<
     IDashboardRestaurantSalesOrderCountDetailsByYearResponseGraphQL | undefined,
@@ -46,16 +52,17 @@ export default function GrowthOverView() {
   >;
 
   const dashboardSalesOrderCountDetailsByYear = useMemo(() => {
-    if (!data) return null;
+    if (!data || error) return null;
+    const salesAmount = data?.getRestaurantDashboardSalesOrderCountDetailsByYear?.salesAmount;
+    const ordersCount = data?.getRestaurantDashboardSalesOrderCountDetailsByYear?.ordersCount;
+    
+    // Handle both array and single value responses
+    // Backend may return single values, but chart expects arrays
     return {
-      salesAmount:
-        data?.getRestaurantDashboardSalesOrderCountDetailsByYear?.salesAmount ??
-        [],
-      ordersCount:
-        data?.getRestaurantDashboardSalesOrderCountDetailsByYear?.ordersCount ??
-        [],
+      salesAmount: Array.isArray(salesAmount) ? salesAmount : (salesAmount !== undefined ? [salesAmount] : []),
+      ordersCount: Array.isArray(ordersCount) ? ordersCount : (ordersCount !== undefined ? [ordersCount] : []),
     };
-  }, [data]);
+  }, [data, error]);
 
   // Handlers
   const onChartDataChange = () => {

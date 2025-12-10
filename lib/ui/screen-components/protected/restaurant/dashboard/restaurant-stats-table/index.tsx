@@ -35,7 +35,7 @@ export default function RestaurantStatesTable({
   const { restaurantLayoutContextData } = useContext(RestaurantLayoutContext);
 
   // API
-  const { data: salesDetailsData, loading: salesDetailsLoading } = useQueryGQL(
+  const { data: salesDetailsData, loading: salesDetailsLoading, error } = useQueryGQL(
     GET_DASHBOARD_ORDER_SALES_DETAILS_BY_PAYMENT_METHOD,
     {
       restaurant: restaurantLayoutContextData?.restaurantId ?? '',
@@ -47,6 +47,12 @@ export default function RestaurantStatesTable({
       fetchPolicy: 'network-only',
       debounceMs: 300,
       enabled: !!restaurantLayoutContextData?.restaurantId,
+      onError: (err) => {
+        // Silently handle missing query errors - backend may not have this query deployed
+        if (err.message?.includes('Cannot query field')) {
+          console.warn('Dashboard query not available in backend:', err.message);
+        }
+      },
     }
   ) as IQueryResult<
     IDashboardOrderSalesDetailsByPaymentMethodResponseGraphQL | undefined,
