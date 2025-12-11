@@ -157,14 +157,30 @@ export default function RestaurantsMain() {
   // Constants
   const menuItems: IActionMenuItem<IRestaurantResponse>[] = [
     {
-      label: t('View'),
+      label: t('View Details'),
       command: (data?: IRestaurantResponse) => {
         if (data) {
-          onUseLocalStorage('save', 'restaurantId', data?._id);
-          onUseLocalStorage('save', 'shopType', data?.shopType);
-          const routeStack = ['Admin'];
-          onUseLocalStorage('save', 'routeStack', JSON.stringify(routeStack));
-          router.push(`/admin/store/`);
+          router.push(`/general/stores/${data._id}`);
+        }
+      },
+    },
+    {
+      label: t('Manage Menu'),
+      command: (data?: IRestaurantResponse) => {
+        if (data) {
+          router.push(`/general/stores/${data._id}/menu`);
+        }
+      },
+    },
+    {
+      label: t('Edit'),
+      command: (data?: IRestaurantResponse) => {
+        if (data) {
+          // Set context data for editing
+          onUseLocalStorage('save', 'restaurantId', data._id);
+          onUseLocalStorage('save', 'shopType', data.shopType);
+          // You may need to set restaurant context data here for the form
+          // This depends on how the restaurant form expects data
         }
       },
     },
@@ -223,11 +239,8 @@ export default function RestaurantsMain() {
             return;
           }
 
-          onUseLocalStorage('save', 'restaurantId', event.data._id);
-          onUseLocalStorage('save', 'shopType', event.data.shopType);
-          const routeStack = ['Admin'];
-          onUseLocalStorage('save', 'routeStack', JSON.stringify(routeStack));
-          router.push(`/admin/store/`);
+          // Navigate to restaurant detail page
+          router.push(`/general/stores/${event.data._id}`);
         }}
       />
 
