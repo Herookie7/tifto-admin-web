@@ -1,7 +1,7 @@
 import { IGlobalComponentProps } from './global.interface';
 
 export interface IActionMenuItem<T> extends IGlobalComponentProps {
-  label: string;
+  label: string | ((data?: T) => string);
   command?: (data?: T) => void;
 }
 

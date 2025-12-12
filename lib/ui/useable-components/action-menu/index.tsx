@@ -37,7 +37,7 @@ const ActionMenu = <T,>({
     <div className="relative">
       <Menu
         model={items?.map((item) => ({
-          label: item.label,
+          label: typeof item.label === 'function' ? item.label(data) : item.label,
           command: (e) => {
             item.command?.(data);
             menuRef.current?.hide(e.originalEvent);
