@@ -22,6 +22,7 @@ import useDebounce from '@/lib/hooks/useDebounce';
 import MenuItemsTableHeader from '../header/table-header';
 import Table from '@/lib/ui/useable-components/table';
 import CustomDialog from '@/lib/ui/useable-components/delete-dialog';
+import ActionMenu from '@/lib/ui/useable-components/table/action-menu';
 import { Skeleton } from 'primereact/skeleton';
 
 // Constants and Interfaces
@@ -286,6 +287,13 @@ export default function MenuItemsMain() {
         </span>
       ),
     },
+    {
+      headerName: t('Actions'),
+      propertyName: 'actions',
+      body: (item: Product) => {
+        return <ActionMenu items={menuItems} data={item} />;
+      },
+    },
   ];
 
   if (loading && products.length === 0) {
@@ -316,7 +324,6 @@ export default function MenuItemsMain() {
         totalRecords={totalRecords}
         currentPage={currentPage}
         onPageChange={handlePageChange}
-        menuItems={menuItems}
       />
 
       <CustomDialog
