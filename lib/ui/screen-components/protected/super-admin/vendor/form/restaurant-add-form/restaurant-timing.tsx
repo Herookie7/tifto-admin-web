@@ -88,13 +88,13 @@ const RestaurantTiming = ({
 
   // Form Submission
   const handleSubmit = (values: ITimingForm[]) => {
-    //conversion from 'HH:MM' to ["HH","MM"]
+    // Keep time as 'HH:MM' string format (GraphQL expects String, not array)
     const formattedData = [...values]?.map((v) => {
       const tempTime = [...v.times];
       const formattedTime = tempTime?.map((time) => {
         return {
-          startTime: time.startTime?.split(':'),
-          endTime: time.endTime?.split(':'),
+          startTime: time.startTime || '',
+          endTime: time.endTime || '',
         };
       });
       return {
