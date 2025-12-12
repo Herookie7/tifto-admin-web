@@ -27,15 +27,17 @@ export default function OrderVendorMain() {
   const [selectedRestaurant, setSelectedRestaurant] =
     useState<IExtendedOrder | null>(null);
 
+  // Ensure restaurantId is a string and not undefined
+  const validRestaurantId = restaurantId && typeof restaurantId === 'string' && restaurantId.trim() !== '' ? restaurantId : null;
+
   const { data, error, loading } = useQueryGQL(
     GET_ORDER_BY_RESTAURANT_WITHOUT_PAGINATION,
-    {
-      restaurant: restaurantId,
-      search: searchTerm, // Only pass restaurant and search
-    },
+    validRestaurantId ? {
+      restaurantId: validRestaurantId,
+    } : {},
     {
       fetchPolicy: 'network-only',
-      enabled: !!restaurantId,
+      enabled: !!validRestaurantId,
     }
   ) as IQueryResult<IOrdersData | undefined, undefined>;
 
@@ -72,7 +74,14 @@ export default function OrderVendorMain() {
       const statusFilter =
         selectedActions.length === 0 ||
         selectedActions.includes(order.orderStatus);
-      return statusFilter;
+      
+      // Client-side search filtering
+      const searchFilter = !searchTerm || 
+        order.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.itemsTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.OrderdeliveryAddress?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      return statusFilter && searchFilter;
     });
   }, [tableData, selectedActions, searchTerm]);
 
@@ -83,7 +92,7 @@ export default function OrderVendorMain() {
     return filteredData;
   }, [loading, filteredData]);
 
-  if (!restaurantId) {
+  if (!validRestaurantId) {
     return null;
   }
 
