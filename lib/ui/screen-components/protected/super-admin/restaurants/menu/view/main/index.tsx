@@ -22,7 +22,7 @@ import useDebounce from '@/lib/hooks/useDebounce';
 import MenuItemsTableHeader from '../header/table-header';
 import Table from '@/lib/ui/useable-components/table';
 import CustomDialog from '@/lib/ui/useable-components/delete-dialog';
-import ActionMenu from '@/lib/ui/useable-components/table/action-menu';
+import ActionMenu from '@/lib/ui/useable-components/action-menu';
 import { Skeleton } from 'primereact/skeleton';
 
 // Constants and Interfaces
