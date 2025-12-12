@@ -11,16 +11,20 @@ const CustomDataView: React.FC<ICustomDataViewProps> = ({
   header,
 }) => {
   const itemTemplate = (review: IReview) => {
+    if (!review || !review.order || !review.order.user) {
+      return null;
+    }
+    
     return (
       <div className="col-12 sm:col-6 lg:col-4 xl:col-3 mb-2">
         <ProfileCard
-          name={review.order.user.name}
-          orderedItems={review.order.items.map((item) => item.title).join(', ')}
-          rating={review.rating}
-          imageSrc={review.restaurant.image}
-          reviewContent={review.description}
-          orderId={review.order.orderId}
-          createdAt={new Date(parseInt(review.createdAt)).toLocaleDateString()}
+          name={review.order?.user?.name || 'N/A'}
+          orderedItems={review.order?.items?.map((item) => item?.title || '').join(', ') || 'N/A'}
+          rating={review.rating || 0}
+          imageSrc={review.restaurant?.image || ''}
+          reviewContent={review.description || ''}
+          orderId={review.order?.orderId || 'N/A'}
+          createdAt={review.createdAt ? new Date(parseInt(review.createdAt)).toLocaleDateString() : 'N/A'}
         />
       </div>
     );

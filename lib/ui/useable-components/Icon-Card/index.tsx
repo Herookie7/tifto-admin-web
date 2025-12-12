@@ -27,13 +27,19 @@ const ProfileCard: React.FC<IProfileCardProps> = ({
   return (
     <div className="flex flex-col items-center p-4 border rounded-lg shadow-sm mx-auto">
       <div className="flex flex-col md:flex-row items-center w-full">
-        <Image
-          src={imageSrc}
-          alt={`Restaurant image`}
-          width={58}
-          height={58}
-          className="rounded-md mr-4"
-        />
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={`Restaurant image`}
+            width={58}
+            height={58}
+            className="rounded-md mr-4"
+          />
+        ) : (
+          <div className="w-[58px] h-[58px] bg-gray-200 rounded-md mr-4 flex items-center justify-center">
+            <span className="text-gray-400 text-xs">No Image</span>
+          </div>
+        )}
         <div className="flex-grow text-center md:text-left">
           <div className="font-semibold">{name}</div>
           <div className="text-sm text-gray-500">{orderedItems}</div>

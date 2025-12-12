@@ -66,7 +66,7 @@ const RatingsHeaderDataView: React.FC<ICommissionRateHeaderProps> = ({
             maxLength={35}
             className="w-64"
             showLabel={false}
-            placeholder={t('Keyword search')}
+            placeholder={t('Keyword Search')}
             value={searchValue}
             onChange={handleSearch}
           />
