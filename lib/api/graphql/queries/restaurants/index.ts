@@ -113,23 +113,24 @@ export const GET_RESTAURANTS_BY_OWNER = gql`
 `;
 
 export const GET_RESTAURANT_DELIVERY_ZONE_INFO = gql`
-  query RestaurantDeliveryZoneInfo($id: ID!) {
-    getRestaurantDeliveryZoneInfo(id: $id) {
-      boundType
+  query RestaurantDeliveryZoneInfo($restaurantId: String!) {
+    getRestaurantDeliveryZoneInfo(restaurantId: $restaurantId) {
+      restaurantId
       deliveryBounds {
         coordinates
       }
-      location {
-        coordinates
+      zone {
+        _id
+        title
+        location {
+          coordinates
+        }
       }
-
-      circleBounds {
-        radius
+      deliveryInfo {
+        minDeliveryFee
+        deliveryDistance
+        deliveryFee
       }
-
-      address
-      city
-      postCode
     }
   }
 `;

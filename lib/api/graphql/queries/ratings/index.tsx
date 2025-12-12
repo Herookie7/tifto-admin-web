@@ -1,28 +1,32 @@
 import { gql } from '@apollo/client';
 export const GET_REVIEWS = gql`
   query Reviews($restaurant: String!) {
-    reviews(restaurant: $restaurant) {
-      _id
-      order {
+    reviewsByRestaurant(restaurant: $restaurant) {
+      reviews {
         _id
-        orderId
-        items {
-          title
+        order {
+          _id
+          orderId
+          items {
+            title
+          }
+          user {
+            _id
+            name
+            email
+          }
         }
-        user {
+        restaurant {
           _id
           name
-          email
+          image
         }
+        rating
+        description
+        createdAt
       }
-      restaurant {
-        _id
-        name
-        image
-      }
-      rating
-      description
-      createdAt
+      ratings
+      total
     }
   }
 `;

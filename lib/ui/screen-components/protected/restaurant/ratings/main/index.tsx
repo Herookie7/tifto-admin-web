@@ -28,16 +28,16 @@ const RatingMain: React.FC = () => {
   }, [data, selectedActions, searchTerm]);
 
   const filterReviews = () => {
-    if (!data || !data.reviews || data.reviews.length === 0) {
+    const reviews = data?.reviewsByRestaurant?.reviews || [];
+    if (!data || !reviews || reviews.length === 0) {
       setFilteredReviews([]);
       return;
     }
 
-    let filtered = data.reviews;
+    let filtered = reviews;
 
     if (searchTerm) {
       filtered = filtered.filter((review: IReview) => {
-        console.log(review.order);
         return (
           review.order?.user?.name
             ?.toLowerCase()
@@ -81,9 +81,11 @@ const RatingMain: React.FC = () => {
       </p>
     );
 
+  const reviews = data?.reviewsByRestaurant?.reviews || [];
+
   return (
     <div className="p-3">
-      {!data || !data.reviews || data.reviews.length === 0 ? (
+      {!data || !reviews || reviews.length === 0 ? (
         <div className="text-center">
           <p className="mt-8 text-gray-600">{t('No records found')}</p>
         </div>

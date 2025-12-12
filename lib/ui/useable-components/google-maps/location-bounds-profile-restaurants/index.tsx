@@ -119,7 +119,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
   const { loading: isFetchingRestaurantDeliveryZoneInfo } = useQuery(
     GET_RESTAURANT_DELIVERY_ZONE_INFO,
     {
-      variables: { id: restaurantId ?? '' },
+      variables: { restaurantId: restaurantId ?? '' },
       fetchPolicy: 'network-only',
       skip: !restaurantId,
       onCompleted: onRestaurantZoneInfoFetchCompleted,
@@ -160,7 +160,6 @@ const CustomGoogleMapsLocationBounds: React.FC<
     []
   );
 
-  console.log("Zones........ ", zones);
   // API Handlers
   function updateCache(
     cache: ApolloCache<unknown>,
