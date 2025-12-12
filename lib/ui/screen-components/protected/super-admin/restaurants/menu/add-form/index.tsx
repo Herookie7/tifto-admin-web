@@ -20,6 +20,15 @@ import { MenuItemsContext } from '@/lib/context/super-admin/menu-items.context';
 // Services
 import { productsService } from '@/lib/services';
 
+interface Variation {
+  _id?: string;
+  title: string;
+  price: number;
+  discounted?: number;
+  default?: boolean;
+  sku?: string;
+}
+
 interface ProductFormData {
   title: string;
   description: string;
@@ -29,6 +38,7 @@ interface ProductFormData {
   available: boolean;
   isActive: boolean;
   categories?: string[];
+  variations?: Variation[];
 }
 
 export default function MenuItemForm() {
@@ -54,6 +64,15 @@ export default function MenuItemForm() {
     available: true,
     isActive: true,
     categories: [],
+    variations: [],
+  });
+  
+  const [newVariation, setNewVariation] = useState<Variation>({
+    title: '',
+    price: 0,
+    discounted: undefined,
+    default: false,
+    sku: '',
   });
 
   const isEditing = !!editingMenuItem;
@@ -69,6 +88,7 @@ export default function MenuItemForm() {
         available: editingMenuItem.available !== false,
         isActive: editingMenuItem.isActive !== false,
         categories: editingMenuItem.categories || [],
+        variations: editingMenuItem.variations || [],
       });
     } else {
       setFormData({
@@ -80,8 +100,16 @@ export default function MenuItemForm() {
         available: true,
         isActive: true,
         categories: [],
+        variations: [],
       });
     }
+    setNewVariation({
+      title: '',
+      price: 0,
+      discounted: undefined,
+      default: false,
+      sku: '',
+    });
   }, [editingMenuItem, isMenuItemsFormVisible]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,6 +165,57 @@ export default function MenuItemForm() {
   const handleClose = () => {
     onMenuItemsFormVisible(false);
     onSetEditingMenuItem(null);
+  };
+
+  const addVariation = () => {
+    if (!newVariation.title || !newVariation.price) {
+      showToast({
+        type: 'error',
+        title: t('Validation Error'),
+        message: t('Please fill in variation title and price'),
+      });
+      return;
+    }
+
+    const variations = formData.variations || [];
+    const updatedVariations = [...variations, { ...newVariation }];
+    
+    // If this is the first variation or marked as default, set it as default
+    if (updatedVariations.length === 1 || newVariation.default) {
+      updatedVariations.forEach((v, index) => {
+        v.default = index === updatedVariations.length - 1;
+      });
+    }
+
+    setFormData({ ...formData, variations: updatedVariations });
+    setNewVariation({
+      title: '',
+      price: 0,
+      discounted: undefined,
+      default: false,
+      sku: '',
+    });
+  };
+
+  const removeVariation = (index: number) => {
+    const variations = formData.variations || [];
+    const updatedVariations = variations.filter((_, i) => i !== index);
+    
+    // Ensure at least one variation is marked as default
+    if (updatedVariations.length > 0 && !updatedVariations.some(v => v.default)) {
+      updatedVariations[0].default = true;
+    }
+    
+    setFormData({ ...formData, variations: updatedVariations });
+  };
+
+  const setDefaultVariation = (index: number) => {
+    const variations = formData.variations || [];
+    const updatedVariations = variations.map((v, i) => ({
+      ...v,
+      default: i === index,
+    }));
+    setFormData({ ...formData, variations: updatedVariations });
   };
 
   return (
@@ -252,6 +331,146 @@ export default function MenuItemForm() {
               <label htmlFor="isActive" className="ml-2">
                 {t('Active')}
               </label>
+            </div>
+          </div>
+
+          {/* Variations Section */}
+          <div className="border-t pt-4 mt-4">
+            <div className="flex items-center justify-between mb-4">
+              <label className="block text-sm font-medium">
+                {t('Variations')} <span className="text-gray-500 text-xs">({t('Optional - will auto-create default if empty')})</span>
+              </label>
+            </div>
+
+            {/* Existing Variations */}
+            {formData.variations && formData.variations.length > 0 && (
+              <div className="mb-4 space-y-2">
+                {formData.variations.map((variation, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 p-2 border rounded bg-gray-50"
+                  >
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        {variation.title}
+                        {variation.default && (
+                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            {t('Default')}
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {t('Price')}: {variation.price}
+                        {variation.discounted && (
+                          <span className="ml-2 line-through text-gray-400">
+                            {variation.discounted}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {!variation.default && (
+                        <Button
+                          type="button"
+                          icon="pi pi-check"
+                          className="p-button-sm p-button-text"
+                          onClick={() => setDefaultVariation(index)}
+                          title={t('Set as default')}
+                        />
+                      )}
+                      <Button
+                        type="button"
+                        icon="pi pi-trash"
+                        className="p-button-sm p-button-danger p-button-text"
+                        onClick={() => removeVariation(index)}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add New Variation Form */}
+            <div className="border rounded p-3 bg-gray-50">
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">
+                      {t('Title')} <span className="text-red-500">*</span>
+                    </label>
+                    <InputText
+                      value={newVariation.title}
+                      onChange={(e) =>
+                        setNewVariation({ ...newVariation, title: e.target.value })
+                      }
+                      className="w-full"
+                      placeholder={t('e.g., Full Portion')}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium mb-1">
+                      {t('Price')} <span className="text-red-500">*</span>
+                    </label>
+                    <InputNumber
+                      value={newVariation.price}
+                      onValueChange={(e) =>
+                        setNewVariation({ ...newVariation, price: e.value || 0 })
+                      }
+                      className="w-full"
+                      mode="decimal"
+                      min={0}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-xs font-medium mb-1">
+                      {t('Discounted Price')}
+                    </label>
+                    <InputNumber
+                      value={newVariation.discounted}
+                      onValueChange={(e) =>
+                        setNewVariation({ ...newVariation, discounted: e.value || undefined })
+                      }
+                      className="w-full"
+                      mode="decimal"
+                      min={0}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium mb-1">
+                      {t('SKU')}
+                    </label>
+                    <InputText
+                      value={newVariation.sku}
+                      onChange={(e) =>
+                        setNewVariation({ ...newVariation, sku: e.target.value })
+                      }
+                      className="w-full"
+                      placeholder={t('Optional')}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    inputId="defaultVariation"
+                    checked={newVariation.default || false}
+                    onChange={(e) =>
+                      setNewVariation({ ...newVariation, default: e.checked || false })
+                    }
+                  />
+                  <label htmlFor="defaultVariation" className="text-sm">
+                    {t('Set as default variation')}
+                  </label>
+                </div>
+                <Button
+                  type="button"
+                  label={t('Add Variation')}
+                  icon="pi pi-plus"
+                  className="p-button-sm"
+                  onClick={addVariation}
+                />
+              </div>
             </div>
           </div>
 
