@@ -19,11 +19,21 @@ export interface IReview extends IGlobalComponentProps {
     _id: string;
     orderId: string;
     items: Array<{ title: string }>;
-    user: {
+    user?: {
       _id: string;
       name: string;
       email: string;
     };
+    customer?: {
+      _id: string;
+      name: string;
+      email: string;
+    };
+  };
+  user?: {
+    _id: string;
+    name: string;
+    email: string;
   };
   restaurant: {
     _id: string;
@@ -32,7 +42,7 @@ export interface IReview extends IGlobalComponentProps {
   };
   rating: number;
   description: string;
-  createdAt: string;
+  createdAt: string | number | Date;
 }
 
 export interface ICustomDataViewProps extends IGlobalComponentProps {

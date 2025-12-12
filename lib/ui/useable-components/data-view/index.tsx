@@ -11,20 +11,58 @@ const CustomDataView: React.FC<ICustomDataViewProps> = ({
   header,
 }) => {
   const itemTemplate = (review: IReview) => {
-    if (!review || !review.order || !review.order.user) {
+    if (!review || !review.order) {
       return null;
     }
+    
+    // Format date - handle both timestamp numbers and date strings
+    const formatDate = (dateValue: string | number | Date | null | undefined): string => {
+      if (!dateValue) return 'N/A';
+      
+      try {
+        let date: Date;
+        if (typeof dateValue === 'number') {
+          // If it's a timestamp number
+          date = new Date(dateValue);
+        } else if (typeof dateValue === 'string') {
+          // Try parsing as timestamp first
+          const timestamp = parseInt(dateValue);
+          if (!isNaN(timestamp) && dateValue.trim().length >= 10) {
+            date = new Date(timestamp);
+          } else {
+            // Otherwise parse as date string
+            date = new Date(dateValue);
+          }
+        } else {
+          date = new Date(dateValue);
+        }
+        
+        if (isNaN(date.getTime())) {
+          return 'N/A';
+        }
+        
+        return date.toLocaleDateString();
+      } catch (error) {
+        return 'N/A';
+      }
+    };
+    
+    // Get user name - check review.user first (direct user field), then order.user
+    const userName = (review as any)?.user?.name || 
+                     review.order?.user?.name || 
+                     (review.order as any)?.customer?.name || 
+                     'N/A';
     
     return (
       <div className="col-12 sm:col-6 lg:col-4 xl:col-3 mb-2">
         <ProfileCard
-          name={review.order?.user?.name || 'N/A'}
+          name={userName}
           orderedItems={review.order?.items?.map((item) => item?.title || '').join(', ') || 'N/A'}
           rating={review.rating || 0}
           imageSrc={review.restaurant?.image || ''}
           reviewContent={review.description || ''}
           orderId={review.order?.orderId || 'N/A'}
-          createdAt={review.createdAt ? new Date(parseInt(review.createdAt)).toLocaleDateString() : 'N/A'}
+          createdAt={formatDate(review.createdAt)}
         />
       </div>
     );

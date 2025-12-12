@@ -16,6 +16,11 @@ export const GET_REVIEWS = gql`
             email
           }
         }
+        user {
+          _id
+          name
+          email
+        }
         restaurant {
           _id
           name
