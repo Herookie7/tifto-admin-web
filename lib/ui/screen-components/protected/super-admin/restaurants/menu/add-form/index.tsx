@@ -1,7 +1,7 @@
 'use client';
 
 // Core
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -12,6 +12,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 
 // Context
 import { ToastContext } from '@/lib/context/global/toast.context';
@@ -19,6 +20,11 @@ import { MenuItemsContext } from '@/lib/context/super-admin/menu-items.context';
 
 // Services
 import { productsService } from '@/lib/services';
+
+// API
+import { GET_CATEGORY_BY_RESTAURANT_ID } from '@/lib/api/graphql';
+import { useQueryGQL } from '@/lib/hooks/useQueryQL';
+import { IQueryResult, ICategoryByRestaurantResponse, ICategory, IDropdownSelectItem } from '@/lib/utils/interfaces';
 
 interface Variation {
   _id?: string;
@@ -38,6 +44,7 @@ interface ProductFormData {
   available: boolean;
   isActive: boolean;
   categories?: string[];
+  category?: string; // Single category selection
   variations?: Variation[];
 }
 
@@ -75,10 +82,36 @@ export default function MenuItemForm() {
     sku: '',
   });
 
+  const [selectedCategory, setSelectedCategory] = useState<IDropdownSelectItem | null>(null);
+
   const isEditing = !!editingMenuItem;
+
+  // Fetch categories for the restaurant
+  const {
+    data: categoriesData,
+    loading: categoriesLoading,
+  } = useQueryGQL(
+    GET_CATEGORY_BY_RESTAURANT_ID,
+    { id: restaurantId },
+    {
+      enabled: !!restaurantId,
+      fetchPolicy: 'network-only',
+    }
+  ) as IQueryResult<ICategoryByRestaurantResponse | undefined, undefined>;
+
+  // Memoized categories dropdown
+  const categoriesDropdown = useMemo(() => {
+    return categoriesData?.restaurant?.categories.map((category: ICategory) => ({
+      label: category.title,
+      code: category._id,
+    })) || [];
+  }, [categoriesData?.restaurant?.categories]);
 
   useEffect(() => {
     if (editingMenuItem) {
+      const editingCategories = editingMenuItem.categories || [];
+      const firstCategory = editingCategories.length > 0 ? editingCategories[0] : null;
+      
       setFormData({
         title: editingMenuItem.title || '',
         description: editingMenuItem.description || '',
@@ -87,9 +120,18 @@ export default function MenuItemForm() {
         image: editingMenuItem.image || '',
         available: editingMenuItem.available !== false,
         isActive: editingMenuItem.isActive !== false,
-        categories: editingMenuItem.categories || [],
+        categories: editingCategories,
+        category: firstCategory || '',
         variations: editingMenuItem.variations || [],
       });
+
+      // Set selected category dropdown
+      if (firstCategory && categoriesDropdown.length > 0) {
+        const categoryOption = categoriesDropdown.find(cat => cat.code === firstCategory);
+        setSelectedCategory(categoryOption || null);
+      } else {
+        setSelectedCategory(null);
+      }
     } else {
       setFormData({
         title: '',
@@ -100,8 +142,10 @@ export default function MenuItemForm() {
         available: true,
         isActive: true,
         categories: [],
+        category: '',
         variations: [],
       });
+      setSelectedCategory(null);
     }
     setNewVariation({
       title: '',
@@ -110,7 +154,7 @@ export default function MenuItemForm() {
       default: false,
       sku: '',
     });
-  }, [editingMenuItem, isMenuItemsFormVisible]);
+  }, [editingMenuItem, isMenuItemsFormVisible, categoriesDropdown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,10 +170,17 @@ export default function MenuItemForm() {
 
     try {
       setLoading(true);
+      // Convert category selection to categories array format
+      const categoriesArray = formData.category ? [formData.category] : [];
+      
       const productData = {
         ...formData,
         restaurant: restaurantId,
+        categories: categoriesArray,
       };
+      
+      // Remove the single category field before sending
+      delete productData.category;
 
       if (isEditing && editingMenuItem?._id) {
         await productsService.updateProduct(editingMenuItem._id, productData);
@@ -303,6 +354,30 @@ export default function MenuItemForm() {
               }
               className="w-full"
               placeholder="https://..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              {t('Category')}
+            </label>
+            <Dropdown
+              value={selectedCategory}
+              options={categoriesDropdown}
+              onChange={(e: DropdownChangeEvent) => {
+                const selected = e.value as IDropdownSelectItem | null;
+                setSelectedCategory(selected);
+                setFormData({
+                  ...formData,
+                  category: selected?.code || '',
+                });
+              }}
+              optionLabel="label"
+              placeholder={categoriesLoading ? t('Loading categories...') : t('Select a category')}
+              className="w-full"
+              filter
+              showClear
+              disabled={categoriesLoading}
             />
           </div>
 
