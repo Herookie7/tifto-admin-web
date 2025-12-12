@@ -45,6 +45,9 @@ export const GET_ALL_WITHDRAW_REQUESTS = gql`
             accountName
             accountCode
             accountNumber
+            bussinessRegNo
+            companyRegNo
+            taxRate
           }
         }
         store {
@@ -63,6 +66,9 @@ export const GET_ALL_WITHDRAW_REQUESTS = gql`
             accountName
             accountCode
             accountNumber
+            bussinessRegNo
+            companyRegNo
+            taxRate
           }
         }
       }

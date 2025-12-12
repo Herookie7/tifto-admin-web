@@ -38,6 +38,9 @@ export const UPDATE_WITHDRAW_REQUEST = gql`
             accountName
             accountCode
             accountNumber
+            bussinessRegNo
+            companyRegNo
+            taxRate
           }
         }
         store {
@@ -56,6 +59,9 @@ export const UPDATE_WITHDRAW_REQUEST = gql`
             accountName
             accountCode
             accountNumber
+            bussinessRegNo
+            companyRegNo
+            taxRate
           }
         }
       }

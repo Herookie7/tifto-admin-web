@@ -183,6 +183,9 @@ export const GET_RESTAURANT_PROFILE = gql`
         accountName
         accountCode
         accountNumber
+        bussinessRegNo
+        companyRegNo
+        taxRate
       }
 
       currentWalletAmount

@@ -44,7 +44,7 @@ export interface IStoreEarnings
 export enum UserTypeEnum {
   ALL = 'ALL',
   RIDER = 'RIDER',
-  STORE = 'STORE',
+  STORE = 'SELLER', // Backend uses SELLER instead of STORE
 }
 
 export enum OrderTypeEnum {

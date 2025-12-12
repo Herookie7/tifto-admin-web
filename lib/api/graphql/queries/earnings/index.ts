@@ -39,7 +39,8 @@ export const GET_EARNING = gql`
             totalEarnings
           }
           riderEarnings {
-            riderId {
+            riderId
+            rider {
               _id
               name
               username
@@ -49,7 +50,8 @@ export const GET_EARNING = gql`
             totalEarnings
           }
           storeEarnings {
-            storeId {
+            storeId
+            store {
               _id
               name
               username
@@ -103,7 +105,8 @@ export const GET_EARNING_FOR_STORE = gql`
           createdAt
           updatedAt
           riderEarnings {
-            riderId {
+            riderId
+            rider {
               _id
               name
               username
@@ -113,7 +116,8 @@ export const GET_EARNING_FOR_STORE = gql`
             totalEarnings
           }
           storeEarnings {
-            storeId {
+            storeId
+            store {
               _id
               name
               username

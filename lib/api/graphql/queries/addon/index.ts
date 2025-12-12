@@ -10,7 +10,12 @@ export const GET_ADDONS_BY_RESTAURANT_ID = gql`
         description
         quantityMinimum
         quantityMaximum
-        options
+        options {
+          _id
+          title
+          description
+          price
+        }
       }
     }
   }
