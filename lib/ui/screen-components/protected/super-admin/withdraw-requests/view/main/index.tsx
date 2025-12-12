@@ -48,9 +48,9 @@ export default function WithdrawRequestsSuperAdminMain({
   // Hooks
   const debouncedSearch = useDebounce(globalFilterValue);
 
-  // Get userType from selected actions (RIDER or STORE)
+  // Get userType from selected actions (RIDER or STORE/SELLER)
   const selectedUserType = selectedActions.find((action) =>
-    ['RIDER', 'STORE'].includes(action)
+    ['RIDER', 'STORE', 'SELLER'].includes(action)
   );
 
   // Get status filter from selected actions
@@ -58,12 +58,15 @@ export default function WithdrawRequestsSuperAdminMain({
     ['REQUESTED', 'TRANSFERRED', 'CANCELLED'].includes(action)
   );
 
+  // Map STORE to SELLER for backend compatibility
+  const mappedUserType = selectedUserType === 'STORE' ? 'SELLER' : selectedUserType;
+
   // Query with proper typing
   const { data, loading, refetch } = useQuery(GET_ALL_WITHDRAW_REQUESTS, {
     variables: {
       pageSize: pageSize,
       pageNo: currentPage,
-      userType: selectedUserType,
+      userType: mappedUserType as any,
       search: debouncedSearch,
     },
     fetchPolicy: 'network-only',

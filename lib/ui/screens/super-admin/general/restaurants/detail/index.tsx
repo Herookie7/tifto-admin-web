@@ -21,22 +21,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faEdit, faTrash, faUtensils } from '@fortawesome/free-solid-svg-icons';
 import CustomDialog from '@/lib/ui/useable-components/delete-dialog';
 
-// Interfaces
+// Interfaces - Match the service return type
 interface Restaurant {
-  _id: string;
+  _id?: string;
   name: string;
   address: string;
+  owner?: string | {
+    _id?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
   phone?: string;
   email?: string;
   description?: string;
   image?: string;
   logo?: string;
-  owner?: {
-    _id: string;
-    name?: string;
-    email?: string;
-    phone?: string;
-  };
   commissionRate?: number;
   commissionType?: 'fixed' | 'percentage';
   tax?: number;
@@ -51,6 +51,7 @@ interface Restaurant {
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
+  [key: string]: any;
 }
 
 export default function RestaurantDetailScreen() {
@@ -95,7 +96,7 @@ export default function RestaurantDetailScreen() {
       // Set context data for editing - matching the expected structure
       onSetRestaurantsContextData({
         restaurant: {
-          _id: restaurant._id,
+          _id: restaurant._id || '',
           name: restaurant.name,
           address: restaurant.address,
           phone: restaurant.phone,
@@ -117,7 +118,7 @@ export default function RestaurantDetailScreen() {
           tags: restaurant.tags,
         } as any,
         vendor: {
-          _id: restaurant.owner?._id || null,
+          _id: (typeof restaurant.owner === 'object' && restaurant.owner?._id) || restaurant.owner || null,
         } as any,
         isEditing: true,
       } as any);
@@ -126,7 +127,7 @@ export default function RestaurantDetailScreen() {
   };
 
   const handleDelete = async () => {
-    if (!restaurant) return;
+    if (!restaurant || !restaurant._id) return;
 
     try {
       setDeleting(true);
@@ -263,7 +264,7 @@ export default function RestaurantDetailScreen() {
 
         {/* Owner Information */}
         <Card title={t('Owner Information')} className="shadow-md">
-          {restaurant.owner ? (
+          {restaurant.owner && typeof restaurant.owner === 'object' ? (
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-gray-500">{t('Owner Name')}</span>

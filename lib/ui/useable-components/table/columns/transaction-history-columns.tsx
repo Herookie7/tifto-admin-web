@@ -1,5 +1,6 @@
 import { IActionMenuProps } from '@/lib/utils/interfaces/action-menu.interface';
 import { ITransactionHistory } from '@/lib/utils/interfaces';
+import { UserTypeEnum } from '@/lib/utils/interfaces/earnings.interface';
 import ActionMenu from '@/lib/ui/useable-components/action-menu';
 import { useTranslations } from 'next-intl';
 
@@ -29,10 +30,10 @@ export const TRANSACTION_HISTORY_COLUMNS = ({
       headerName: t('User'),
       propertyName: 'user',
       body: (transaction: ITransactionHistory) => {
-        if (transaction.userType === 'RIDER' && transaction.rider) {
+        if (transaction.userType === UserTypeEnum.RIDER && transaction.rider) {
           return transaction.rider.name;
         }
-        if (transaction.userType === 'STORE' && transaction.store) {
+        if (transaction.userType === UserTypeEnum.STORE && transaction.store) {
           return transaction.store.name;
         }
         return '-';
