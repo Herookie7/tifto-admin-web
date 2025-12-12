@@ -28,7 +28,7 @@ import { Skeleton } from 'primereact/skeleton';
 import { IActionMenuItem } from '@/lib/utils/interfaces';
 
 interface Product {
-  _id: string;
+  _id?: string;
   title: string;
   description?: string;
   price: number;
