@@ -135,6 +135,14 @@ export default function MenuItemsMain() {
 
   // Handle toggle availability
   const handleToggleAvailability = async (product: Product) => {
+    if (!product._id) {
+      showToast({
+        type: 'error',
+        title: t('Error'),
+        message: t('Product ID is missing'),
+      });
+      return;
+    }
     try {
       await productsService.toggleProductAvailability(
         product._id,
@@ -174,7 +182,7 @@ export default function MenuItemsMain() {
     {
       label: t('Delete'),
       command: (data?: Product) => {
-        if (data) {
+        if (data && data._id) {
           setDeleteId(data._id);
         }
       },
