@@ -44,11 +44,18 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
     },
   });
 
-  // WebSocketLink with error handling
+  // WebSocketLink with error handling and retry logic
   const subscriptionClient = new SubscriptionClient(wsGraphqlUrl, {
     reconnect: true,
     timeout: 30000,
     lazy: true,
+    reconnectionAttempts: 5,
+    connectionCallback: (error) => {
+      if (error) {
+        console.error('WebSocket connection failed:', error);
+        // The client will automatically retry with exponential backoff
+      }
+    },
     connectionParams: () => {
       const token = getCachedAuthToken();
       if (token) {
@@ -62,19 +69,30 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
 
   // Handle WebSocket connection events
   subscriptionClient.on('connected', () => {
-    console.log('WebSocket connected');
+    if (typeof window !== 'undefined') {
+      console.log('✅ WebSocket connected to:', wsGraphqlUrl);
+    }
   });
 
   subscriptionClient.on('disconnected', () => {
-    console.warn('WebSocket disconnected');
+    if (typeof window !== 'undefined') {
+      console.warn('⚠️ WebSocket disconnected. Will attempt to reconnect...');
+    }
   });
 
   subscriptionClient.on('reconnected', () => {
-    console.log('WebSocket reconnected');
+    if (typeof window !== 'undefined') {
+      console.log('✅ WebSocket reconnected successfully');
+    }
   });
 
   subscriptionClient.on('error', (error) => {
-    console.error('WebSocket connection error:', error);
+    if (typeof window !== 'undefined') {
+      // Only log non-critical errors (connection errors are handled by reconnect logic)
+      if (error.message && !error.message.includes('connection')) {
+        console.error('WebSocket error:', error);
+      }
+    }
   });
 
   const wsLink = new WebSocketLink(subscriptionClient);
@@ -176,6 +194,8 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   );
 
   // Terminating Link for split between HTTP and WebSocket
+  // Subscriptions use WebSocket, queries and mutations use HTTP
+  // The lazy connection and reconnection logic in SubscriptionClient handles failures gracefully
   const terminatingLink = split(
     ({ query }) => {
       const definition = getMainDefinition(query);

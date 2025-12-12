@@ -34,7 +34,7 @@ export default function DashboardRestaurantStatsTable({
             {t(
               DASHBOARD_PAYMENT_METHOD_SUB_TITLE[
                 title as keyof typeof DASHBOARD_PAYMENT_METHOD_SUB_TITLE
-              ].toString()
+              ]?.toString() ?? title ?? 'N/A'
             )}
           </h2>
           <i className="fas fa-arrow-down text-green-500"></i>

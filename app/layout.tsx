@@ -24,7 +24,20 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
        <head>
-        {/* Microsoft Clarity */}
+        {/* 
+          Microsoft Clarity Analytics
+          
+          Note: Browser cookie warnings for "_clsk" are expected and safe to ignore.
+          These are third-party cookies from Microsoft Clarity used for analytics tracking.
+          The warnings occur because modern browsers (with dynamic state partitioning) 
+          restrict third-party cookie access for privacy reasons.
+          
+          The warnings do not affect functionality - Clarity will work with reduced 
+          tracking capabilities. To fully eliminate warnings, you would need to either:
+          1. Remove Microsoft Clarity analytics
+          2. Use a first-party analytics solution
+          3. Accept that reduced third-party cookie functionality is a privacy feature
+        */}
         <Script id="microsoft-clarity" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){

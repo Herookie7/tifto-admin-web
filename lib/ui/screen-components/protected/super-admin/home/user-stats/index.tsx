@@ -32,20 +32,6 @@ export default function UserStats() {
   // Hooks
   const t = useTranslations();
 
-  // Helper to safely get translations with fallback
-  const safeTranslate = (key: string, fallback: string) => {
-    try {
-      const translated = t(key);
-      // If translation returns the key with MISSING_MESSAGE, use fallback
-      if (translated.includes('MISSING_MESSAGE') || translated === key) {
-        return fallback;
-      }
-      return translated;
-    } catch {
-      return fallback;
-    }
-  };
-
   const dashboardUsers = useMemo(() => {
     if (!data) return null;
     return {
@@ -61,7 +47,7 @@ export default function UserStats() {
       <StatsCard
         label={t('Total Users')}
         total={dashboardUsers?.usersCount ?? 0}
-        description={safeTranslate('8.5% up from yesterday', '8.5% up from yesterday')}
+        description={t('8.5% up from yesterday')}
         icon={faUsers}
         route="/general/users"
         loading={loading}
@@ -69,7 +55,7 @@ export default function UserStats() {
       <StatsCard
         label={t('Total Vendors')}
         total={dashboardUsers?.vendorsCount ?? 0}
-        description={safeTranslate('2.4% up from yesterday', '2.4% up from yesterday')}
+        description={t('2.4% up from yesterday')}
         icon={faStore}
         route="/general/vendors"
         loading={loading}
@@ -77,7 +63,7 @@ export default function UserStats() {
       <StatsCard
         label={t('Total Stores')}
         total={dashboardUsers?.restaurantsCount ?? 0}
-        description={safeTranslate('6.1% down from yesterday', '6.1% down from yesterday')}
+        description={t('6.1% down from yesterday')}
         icon={faUtensils}
         route="/general/stores"
         loading={loading}
@@ -85,7 +71,7 @@ export default function UserStats() {
       <StatsCard
         label={t('Total Riders')}
         total={dashboardUsers?.ridersCount ?? 0}
-        description={safeTranslate('1.9% up from yesterday', '1.9% up from yesterday')}
+        description={t('1.9% up from yesterday')}
         icon={faMotorcycle}
         route="/general/riders"
         loading={loading}

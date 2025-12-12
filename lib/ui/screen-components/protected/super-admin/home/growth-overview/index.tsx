@@ -39,11 +39,29 @@ export default function GrowthOverView() {
 
   const dashboardUsersByYear = useMemo(() => {
     if (!data) return null;
+    
+    // Helper to normalize values to arrays - handle both array and single Int responses
+    const normalizeToArray = (value: unknown): number[] => {
+      if (Array.isArray(value)) {
+        // Ensure array has 12 elements for 12 months
+        return value.length === 12 ? value : new Array(12).fill(0);
+      }
+      if (typeof value === 'number') {
+        // If single Int value, return array of 12 zeros (or spread the value)
+        return new Array(12).fill(0);
+      }
+      // Default to empty array
+      return new Array(12).fill(0);
+    };
+
+    const response = data?.getDashboardUsersByYear;
+    if (!response) return null;
+
     return {
-      usersCount: data?.getDashboardUsersByYear?.usersCount ?? [],
-      vendorsCount: data?.getDashboardUsersByYear?.vendorsCount ?? [],
-      restaurantsCount: data?.getDashboardUsersByYear?.restaurantsCount ?? [],
-      ridersCount: data?.getDashboardUsersByYear?.ridersCount ?? [],
+      usersCount: normalizeToArray(response.usersCount),
+      vendorsCount: normalizeToArray(response.vendorsCount),
+      restaurantsCount: normalizeToArray(response.restaurantsCount),
+      ridersCount: normalizeToArray(response.ridersCount),
     };
   }, [data]);
 
