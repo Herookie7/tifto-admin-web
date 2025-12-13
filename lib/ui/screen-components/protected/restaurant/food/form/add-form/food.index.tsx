@@ -173,7 +173,6 @@ export default function FoodDetails({
     {
       enabled: !!categoryDropDown?.code && !!restaurantId,
       fetchPolicy: 'cache-and-network',
-      skip: !categoryDropDown?.code, // Skip query if no category selected
     }
   ) as IQueryResult<
     ISubCategoryByParentIdResponse | undefined,
