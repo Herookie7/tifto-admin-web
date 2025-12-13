@@ -28,8 +28,8 @@ export const CREATE_FOOD = gql`
 `;
 
 export const EDIT_FOOD = gql`
-  mutation UpdateProduct($id: ID!, $productInput: ProductInput!) {
-    updateProduct(id: $id, productInput: $productInput) {
+  mutation UpdateProduct($id: ID!, $productInput: ProductInput!, $categoryId: ID) {
+    updateProduct(id: $id, productInput: $productInput, categoryId: $categoryId) {
       _id
       title
       description

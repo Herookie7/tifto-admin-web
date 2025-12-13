@@ -289,11 +289,18 @@ export default function FoodDetails({
 
       if (foodContextData?.isEditing && foodContextData?.food?.data?._id) {
         // Update existing product
+        const updateVariables: any = {
+          id: foodContextData.food.data._id,
+          productInput: productInput,
+        };
+        
+        // Include categoryId if a category is selected
+        if (values.category?.code) {
+          updateVariables.categoryId = values.category.code;
+        }
+
         await createFood({
-          variables: {
-            id: foodContextData.food.data._id,
-            productInput: productInput,
-          },
+          variables: updateVariables,
         });
       } else {
         // Create new product
