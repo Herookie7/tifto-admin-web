@@ -39,13 +39,13 @@ export default function EarningsMain({
     paymentMethod: undefined,
   });
 
-  const { data, loading, refetch } = useQuery(GET_EARNING, {
+  const { data, loading, error, refetch } = useQuery(GET_EARNING, {
     variables: {
       pageSize,
       pageNo: currentPage,
       startingDate: dateFilters.startingDate || undefined,
       endingDate: dateFilters.endingDate || undefined,
-      search: debouncedSearch,
+      search: debouncedSearch || undefined,
       userType:
         dateFilters.userType !== 'ALL' ? dateFilters.userType : undefined,
       userId: dateFilters?.userId ?? undefined,
@@ -57,9 +57,13 @@ export default function EarningsMain({
           : undefined,
     },
     fetchPolicy: 'cache-and-network',
+    errorPolicy: 'all', // Return partial data even if there are errors
     onCompleted: (data) => {
       const grandTotalEarnings = data?.earnings?.data?.grandTotalEarnings;
       setTotalEarnings(grandTotalEarnings);
+    },
+    onError: (error) => {
+      console.error('Error fetching earnings:', error);
     },
   });
 
@@ -109,8 +113,31 @@ export default function EarningsMain({
   };
 
   useEffect(() => {
-    refetch({ search: debouncedSearch });
-  }, [debouncedSearch]);
+    refetch({
+      pageSize,
+      pageNo: currentPage,
+      startingDate: dateFilters.startingDate || undefined,
+      endingDate: dateFilters.endingDate || undefined,
+      search: debouncedSearch || undefined,
+      userType:
+        dateFilters.userType !== 'ALL' ? dateFilters.userType : undefined,
+      userId: dateFilters?.userId ?? undefined,
+      orderType:
+        dateFilters.orderType !== 'ALL' ? dateFilters.orderType : undefined,
+      paymentMethod:
+        dateFilters.paymentMethod !== 'ALL'
+          ? dateFilters.paymentMethod
+          : undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, currentPage, pageSize, dateFilters]);
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      console.error('Error loading earnings:', error);
+    }
+  }, [error]);
 
   return (
     <div className="p-4">
@@ -141,6 +168,11 @@ export default function EarningsMain({
         currentPage={currentPage}
         rowsPerPage={pageSize}
       />
+      {error && (
+        <div className="mt-4 text-red-500 text-sm">
+          Error: {error.message || 'Failed to load earnings'}
+        </div>
+      )}
     </div>
   );
 }

@@ -63,13 +63,19 @@ export default function TransactionHistoryMain() {
   const [openMenuId, setOpenMenuId] = useState<string>('');
 
   // Query with proper typing
-  const { data, loading, refetch } = useQuery(GET_TRANSACTION_HISTORY, {
+  const { data, loading, error, refetch } = useQuery(GET_TRANSACTION_HISTORY, {
     variables: {
       pageSize: pageSize + 30, // Required field
       pageNo: currentPage, // Required field
       startingDate: dateFilters.startingDate || undefined,
       endingDate: dateFilters.endingDate || undefined,
       ...(dateFilters.userType !== 'ALL' && { userType: dateFilters.userType }),
+      search: debouncedSearch || undefined,
+    },
+    fetchPolicy: 'cache-and-network',
+    errorPolicy: 'all', // Return partial data even if there are errors
+    onError: (error) => {
+      console.error('Error fetching transaction history:', error);
     },
   }) as unknown as IQueryResult<ITransactionHistoryResponse | undefined, any>;
 
@@ -105,8 +111,23 @@ export default function TransactionHistoryMain() {
   const transactionData = data?.transactionHistory?.data;
 
   useEffect(() => {
-    refetch({ search: debouncedSearch });
-  }, [debouncedSearch]);
+    refetch({
+      pageSize: pageSize + 30,
+      pageNo: currentPage,
+      startingDate: dateFilters.startingDate || undefined,
+      endingDate: dateFilters.endingDate || undefined,
+      ...(dateFilters.userType !== 'ALL' && { userType: dateFilters.userType }),
+      search: debouncedSearch || undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, currentPage, pageSize, dateFilters]);
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      console.error('Error loading transaction history:', error);
+    }
+  }, [error]);
 
   return (
     <div className="p-3">
@@ -142,6 +163,11 @@ export default function TransactionHistoryMain() {
         onHide={() => setIsModalOpen(false)}
         transaction={selectedTransaction}
       />
+      {error && (
+        <div className="mt-4 text-red-500 text-sm">
+          {t('Error')}: {error.message || t('Failed to load transaction history')}
+        </div>
+      )}
     </div>
   );
 }

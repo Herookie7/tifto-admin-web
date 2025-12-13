@@ -28,26 +28,38 @@ import { useTranslations } from 'next-intl';
 
 const TippingAddForm = () => {
   // Query
-  const { loading, data } = useQueryGQL(GET_TIPPING, {
-    fetchPolicy: 'cache-and-network',
-  }) as IQueryResult<ITippingResponse | undefined, undefined>;
+  const { loading, data, error } = useQueryGQL(
+    GET_TIPPING,
+    {}, // Empty variables object (required parameter)
+    {
+      fetchPolicy: 'cache-and-network',
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onError: (error) => {
+        console.error('Error fetching tips:', error);
+      },
+    }
+  ) as IQueryResult<ITippingResponse | undefined, undefined>;
 
   // Hooks
   const t = useTranslations();
 
-  // State
+  // State - Handle case when data is not yet loaded or tips array is empty
   const initialValues: ITippingsForm = {
-    tip1: data?.tips?.tipVariations[0] ?? 1,
-    tip2: data?.tips?.tipVariations[1] ?? 2,
-    tip3: data?.tips?.tipVariations[2] ?? 3,
+    tip1: data?.tips?.tipVariations?.[0] ?? 1,
+    tip2: data?.tips?.tipVariations?.[1] ?? 2,
+    tip3: data?.tips?.tipVariations?.[2] ?? 3,
   };
 
   // Hooks
   const { showToast } = useToast();
 
   // Mutation
-  const mutation = data && data.tips._id ? EDIT_TIPPING : CREATE_TIPPING;
-  const [mutate, { loading: mutationLoading }] = useMutation(mutation);
+  const mutation = data && data.tips?._id ? EDIT_TIPPING : CREATE_TIPPING;
+  const [mutate, { loading: mutationLoading }] = useMutation(mutation, {
+    onError: (error) => {
+      console.error('Error in tipping mutation:', error);
+    },
+  });
 
   //Form Submission
   const handleSubmit = (
@@ -58,7 +70,7 @@ const TippingAddForm = () => {
       mutate({
         variables: {
           tippingInput: {
-            _id: data.tips._id,
+            _id: data.tips?._id,
             tipVariations: [values.tip1, values.tip2, values.tip3],
             enabled: true,
           },
@@ -158,7 +170,7 @@ const TippingAddForm = () => {
             </div>
             <CustomButton
               className="mb-[2px] mt-auto flex h-11 rounded-md border-gray-300 bg-[black] px-10 text-white"
-              label={data?.tips._id ? t('Update') : t('Add')}
+              label={data?.tips?._id ? t('Update') : t('Add')}
               rounded={false}
               type="submit"
               loading={mutationLoading}

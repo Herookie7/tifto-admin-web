@@ -54,12 +54,24 @@ export default function CommissionRateMain() {
   const { showToast } = useContext(ToastContext);
 
   // Query
-  const { data, error, refetch, loading } = useQueryGQL(GET_RESTAURANTS, {
-    fetchPolicy: 'network-only',
-  }) as IQueryResult<RestaurantsData | undefined, undefined>;
+  const { data, error, refetch, loading } = useQueryGQL(
+    GET_RESTAURANTS,
+    {}, // Empty variables object (required parameter)
+    {
+      fetchPolicy: 'network-only',
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onError: (error) => {
+        console.error('Error fetching restaurants for commission rates:', error);
+      },
+    }
+  ) as IQueryResult<RestaurantsData | undefined, undefined>;
 
   // Mutation
-  const [updateCommissionMutation] = useMutation(updateCommission);
+  const [updateCommissionMutation] = useMutation(updateCommission, {
+    onError: (error) => {
+      console.error('Error updating commission:', error);
+    },
+  });
 
   // Handlers
   const handleSave = async (restaurantId: string) => {
@@ -206,23 +218,24 @@ export default function CommissionRateMain() {
         if (!obj.commissionType) {
           obj.commissionType = 'percentage';
         }
-        console.log(v.commissionRate);
+        console.log('Restaurant commission rate:', v.commissionRate);
         // if (v.commissionRate === null) obj['commissionRate'] = 25;
 
         return obj;
       });
       setRestaurants(updatedRestaurants);
     } else if (error) {
+      console.error('Error fetching restaurants:', error);
       showToast({
         type: 'error',
         title: t('Error Fetching Restaurants'),
-        message: t(
+        message: error.message || t(
           'An error occurred while fetching restaurants. Please try again later.'
         ),
         duration: 2000,
       });
     }
-  }, [data, error]);
+  }, [data, error, showToast, t]);
 
   return (
     <div className="p-3">

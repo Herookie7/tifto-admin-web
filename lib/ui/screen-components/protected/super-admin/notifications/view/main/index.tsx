@@ -21,9 +21,16 @@ import { useQueryGQL } from '@/lib/hooks/useQueryQL';
 import { GET_NOTIFICATIONS } from '@/lib/api/graphql';
 
 export default function NotificationMain() {
-  const { data: notificationData, loading: notificationLoading } = useQueryGQL(
+  const { data: notificationData, loading: notificationLoading, error } = useQueryGQL(
     GET_NOTIFICATIONS,
-    {}
+    {}, // Empty variables object (required parameter)
+    {
+      fetchPolicy: 'cache-and-network',
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onError: (error) => {
+        console.error('Error fetching notifications:', error);
+      },
+    }
   ) as IQueryResult<IGetNotifications | undefined, undefined>;
 
   // States
@@ -47,11 +54,26 @@ export default function NotificationMain() {
     setGlobalFilterValue(value);
   };
 
+  // Handle errors
+  if (error) {
+    console.error('Error loading notifications:', error);
+  }
+
+  // Transform data to ensure body field exists (backend doesn't return body, so use empty string as fallback)
+  const transformedNotifications = notificationData?.notifications?.map((notification) => ({
+    ...notification,
+    body: (notification as any).body || '', // Add empty body if not present
+  })) ?? [];
+
   return (
     <div className="p-3">
       <Table
         columns={NOTIFICATIONS_TABLE_COLUMNS()}
-        data={notificationData?.notifications ?? generateDummyNotifications()}
+        data={
+          notificationLoading
+            ? generateDummyNotifications()
+            : transformedNotifications
+        }
         selectedData={[]}
         setSelectedData={() => {}}
         header={
@@ -65,6 +87,11 @@ export default function NotificationMain() {
         loading={notificationLoading}
         filters={filters}
       />
+      {error && (
+        <div className="mt-4 text-red-500 text-sm">
+          Error loading notifications: {error.message}
+        </div>
+      )}
     </div>
   );
 }

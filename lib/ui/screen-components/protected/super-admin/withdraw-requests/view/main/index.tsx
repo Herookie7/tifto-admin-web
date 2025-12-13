@@ -62,14 +62,18 @@ export default function WithdrawRequestsSuperAdminMain({
   const mappedUserType = selectedUserType === 'STORE' ? 'SELLER' : selectedUserType;
 
   // Query with proper typing
-  const { data, loading, refetch } = useQuery(GET_ALL_WITHDRAW_REQUESTS, {
+  const { data, loading, error, refetch } = useQuery(GET_ALL_WITHDRAW_REQUESTS, {
     variables: {
       pageSize: pageSize,
       pageNo: currentPage,
       userType: mappedUserType as any,
-      search: debouncedSearch,
+      search: debouncedSearch || undefined,
     },
     fetchPolicy: 'network-only',
+    errorPolicy: 'all', // Return partial data even if there are errors
+    onError: (error) => {
+      console.error('Error fetching withdraw requests:', error);
+    },
   }) as unknown as IQueryResult<IGetWithDrawRequestsData | undefined, any>;
 
   // Global search handler
@@ -115,8 +119,21 @@ export default function WithdrawRequestsSuperAdminMain({
 
   // Use Effect
   useEffect(() => {
-    refetch({ search: debouncedSearch });
-  }, [selectedUserType, debouncedSearch]);
+    refetch({
+      pageSize: pageSize,
+      pageNo: currentPage,
+      userType: mappedUserType as any,
+      search: debouncedSearch || undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUserType, debouncedSearch, currentPage, pageSize]);
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      console.error('Error loading withdraw requests:', error);
+    }
+  }, [error]);
 
   return (
     <div className="p-3">
@@ -146,6 +163,11 @@ export default function WithdrawRequestsSuperAdminMain({
         currentPage={currentPage}
         rowsPerPage={pageSize}
       />
+      {error && (
+        <div className="mt-4 text-red-500 text-sm">
+          Error: {error.message || 'Failed to load withdraw requests'}
+        </div>
+      )}
     </div>
   );
 }
