@@ -168,11 +168,12 @@ export default function FoodDetails({
   } = useQueryGQL(
     GET_SUBCATEGORIES_BY_PARENT_ID,
     {
-      parentCategoryId: categoryDropDown?.code,
+      parentCategoryId: categoryDropDown?.code || '',
     },
     {
-      enabled: !!categoryDropDown?.code,
+      enabled: !!categoryDropDown?.code && !!restaurantId,
       fetchPolicy: 'cache-and-network',
+      skip: !categoryDropDown?.code, // Skip query if no category selected
     }
   ) as IQueryResult<
     ISubCategoryByParentIdResponse | undefined,
@@ -235,6 +236,26 @@ export default function FoodDetails({
   // Handlers
   const onFoodSubmitHandler = async (values: ISimplifiedFoodForm) => {
     try {
+      // Validate restaurantId
+      if (!restaurantId) {
+        showToast({
+          type: 'error',
+          title: t('Error'),
+          message: t('Restaurant ID is missing. Please refresh the page.'),
+        });
+        return;
+      }
+
+      // Validate required fields
+      if (!values.category?.code) {
+        showToast({
+          type: 'error',
+          title: t('Validation Error'),
+          message: t('Please select a category'),
+        });
+        return;
+      }
+
       // Create a simple variation with just price and discount
       // Backend expects addons as array of strings (IDs)
       // Note: isOutOfStock is stored on the product, not the variation
@@ -261,6 +282,12 @@ export default function FoodDetails({
         addons: [], // Empty array for simplified form - backend expects [AddonInput]
       };
 
+      console.log('Creating product with:', {
+        restaurantId,
+        categoryId: values.category?.code,
+        productInput,
+      });
+
       if (foodContextData?.isEditing && foodContextData?.food?.data?._id) {
         // Update existing product
         await createFood({
@@ -271,16 +298,29 @@ export default function FoodDetails({
         });
       } else {
         // Create new product
+        // categoryId is optional, so we can pass null or omit it
+        const variables: any = {
+          restaurantId: restaurantId,
+          productInput: productInput,
+        };
+        
+        // Only include categoryId if a category is selected
+        if (values.category?.code) {
+          variables.categoryId = values.category.code;
+        }
+
         await createFood({
-          variables: {
-            restaurantId: restaurantId,
-            categoryId: values.category?.code || null,
-            productInput: productInput,
-          },
+          variables: variables,
         });
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error submitting food:', err);
+      const errorMessage = err?.graphQLErrors?.[0]?.message || err?.message || t('Failed to save product');
+      showToast({
+        type: 'error',
+        title: t('Error'),
+        message: errorMessage,
+      });
     }
   };
 
@@ -296,9 +336,11 @@ export default function FoodDetails({
       setSelectedSubCategories(selectedSubCategory);
     }
     refetchCategories();
-    refetchSubCategories({
-      parentCategoryId: categoryDropDown?.code ?? '',
-    });
+    if (categoryDropDown?.code) {
+      refetchSubCategories({
+        parentCategoryId: categoryDropDown.code,
+      });
+    }
   }, [
     categoryDropDown,
     setIsAddSubCategoriesVisible,
@@ -404,17 +446,16 @@ export default function FoodDetails({
                               showLabel={true}
                               extraFooterButton={{
                                 onChange: () => {
-                                  setIsAddSubCategoriesVisible((prev) => ({
-                                    bool: !prev.bool,
-                                    parentCategoryId:
-                                      values?.category?.code ?? '',
-                                  }));
-                                  refetchSubCategories({
-                                    parentCategoryId:
-                                      values?.category?.code ||
-                                      categoryDropDown?.code ||
-                                      '',
-                                  });
+                                  const parentCategoryId = values?.category?.code || categoryDropDown?.code;
+                                  if (parentCategoryId) {
+                                    setIsAddSubCategoriesVisible((prev) => ({
+                                      bool: !prev.bool,
+                                      parentCategoryId: parentCategoryId,
+                                    }));
+                                    refetchSubCategories({
+                                      parentCategoryId: parentCategoryId,
+                                    });
+                                  }
                                 },
                                 title: t('Add Sub-Category'),
                               }}
