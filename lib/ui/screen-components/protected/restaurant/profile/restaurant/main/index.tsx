@@ -17,8 +17,24 @@ const RestaurantMain: React.FC = () => {
   // Context
   const { restaurantProfileResponse } = useContext(ProfileContext);
   const restaurant = restaurantProfileResponse?.data?.restaurant;
+  const error = restaurantProfileResponse?.error;
 
   if (restaurantProfileResponse.loading) return <RestaurantProfileSkeleton />;
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center mt-8">
+        <div className="bg-white p-8 w-full border-2 border-dotted rounded border-inherit">
+          <div className="text-center text-red-500">
+            <p className="text-lg font-semibold">{t('Error')}</p>
+            <p className="text-sm mt-2">
+              {error.message || t('Failed to load profile')}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const InfoItem: React.FC<IInfoItemProps> = ({ label, value }) => {
     // Conditionally render icons based on label

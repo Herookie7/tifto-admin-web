@@ -39,7 +39,9 @@ export default function GrowthOverView() {
       fetchPolicy: 'network-only',
       enabled: !!restaurantId,
       debounceMs: 300,
+      errorPolicy: 'all', // Return partial data even if there are errors
       onError: (err) => {
+        console.error('Error fetching restaurant dashboard growth data:', err);
         // Silently handle missing query errors or type mismatches
         if (err.message?.includes('Cannot query field') || 
             err.message?.includes('cannot represent non-integer value') ||

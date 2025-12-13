@@ -37,14 +37,17 @@ export default function UserStats({
     GET_DASHBOARD_RESTAURANT_ORDERS,
     {
       restaurant: restaurantId,
-      dateKeyword: dateFilter?.dateKeyword,
-      starting_date: dateFilter?.startDate,
-      ending_date: dateFilter?.endDate,
+      dateKeyword: dateFilter?.dateKeyword || undefined,
+      starting_date: dateFilter?.startDate || undefined,
+      ending_date: dateFilter?.endDate || undefined,
     },
     {
       fetchPolicy: 'network-only',
+      enabled: !!restaurantId,
       debounceMs: 300,
+      errorPolicy: 'all', // Return partial data even if there are errors
       onError: (err) => {
+        console.error('Error fetching restaurant dashboard orders:', err);
         // Silently handle missing query errors - backend may not have this query deployed
         if (err.message?.includes('Cannot query field')) {
           console.warn('Dashboard query not available in backend:', err.message);

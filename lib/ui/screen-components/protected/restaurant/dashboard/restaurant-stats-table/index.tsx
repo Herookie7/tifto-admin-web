@@ -39,15 +39,17 @@ export default function RestaurantStatesTable({
     GET_DASHBOARD_ORDER_SALES_DETAILS_BY_PAYMENT_METHOD,
     {
       restaurant: restaurantLayoutContextData?.restaurantId ?? '',
-      dateKeyword: dateFilter?.dateKeyword,
-      starting_date: dateFilter.startDate,
-      ending_date: dateFilter.endDate,
+      dateKeyword: dateFilter?.dateKeyword || undefined,
+      starting_date: dateFilter.startDate || undefined,
+      ending_date: dateFilter.endDate || undefined,
     },
     {
       fetchPolicy: 'network-only',
       debounceMs: 300,
       enabled: !!restaurantLayoutContextData?.restaurantId,
+      errorPolicy: 'all', // Return partial data even if there are errors
       onError: (err) => {
+        console.error('Error fetching restaurant dashboard payment method stats:', err);
         // Silently handle missing query errors - backend may not have this query deployed
         if (err.message?.includes('Cannot query field')) {
           console.warn('Dashboard query not available in backend:', err.message);

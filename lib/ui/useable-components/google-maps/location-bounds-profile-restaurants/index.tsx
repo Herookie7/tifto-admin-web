@@ -106,22 +106,24 @@ const CustomGoogleMapsLocationBounds: React.FC<
   const listenersRef = useRef<google.maps.MapsEventListener[]>([]);
 
   // API
-  const { loading: isFetchingRestaurantProfile } = useQuery(
+  const { loading: isFetchingRestaurantProfile, error: profileError } = useQuery(
     GET_RESTAURANT_PROFILE,
     {
       variables: { id: restaurantId ?? '' },
       fetchPolicy: 'network-only',
       skip: !restaurantId,
+      errorPolicy: 'all', // Return partial data even if there are errors
       onCompleted: onRestaurantProfileFetchCompleted,
       onError: onErrorFetchRestaurantProfile,
     }
   );
-  const { loading: isFetchingRestaurantDeliveryZoneInfo } = useQuery(
+  const { loading: isFetchingRestaurantDeliveryZoneInfo, error: zoneInfoError } = useQuery(
     GET_RESTAURANT_DELIVERY_ZONE_INFO,
     {
       variables: { restaurantId: restaurantId ?? '' },
       fetchPolicy: 'network-only',
       skip: !restaurantId,
+      errorPolicy: 'all', // Return partial data even if there are errors
       onCompleted: onRestaurantZoneInfoFetchCompleted,
       onError: onErrorFetchRestaurantZoneInfo,
     }
@@ -139,11 +141,15 @@ const CustomGoogleMapsLocationBounds: React.FC<
       onError: onErrorLocationZoneUpdate,
     }
   );
-  useQuery<IZonesResponse>(GET_ZONES, {
+  const { error: zonesError } = useQuery<IZonesResponse>(GET_ZONES, {
+    errorPolicy: 'all', // Return partial data even if there are errors
     onCompleted: (data) => {
       if (data) {
         setZones(data.zones);
       }
+    },
+    onError: (error) => {
+      console.error('Error fetching zones:', error);
     },
   });
   
@@ -185,11 +191,15 @@ const CustomGoogleMapsLocationBounds: React.FC<
     graphQLErrors,
     networkError,
   }: ApolloError) {
+    console.error('Error fetching restaurant profile for location:', {
+      graphQLErrors,
+      networkError,
+    });
     showToast({
       type: 'error',
       title: t('Store Profile'),
       message:
-        graphQLErrors[0].message ??
+        graphQLErrors?.[0]?.message ??
         networkError?.message ??
         t('Store Profile Fetch Failed'),
       duration: 2500,
@@ -225,11 +235,15 @@ const CustomGoogleMapsLocationBounds: React.FC<
     graphQLErrors,
     networkError,
   }: ApolloError) {
+    console.error('Error fetching restaurant delivery zone info:', {
+      graphQLErrors,
+      networkError,
+    });
     showToast({
       type: 'error',
       title: t('Store Location & Zone'),
       message:
-        graphQLErrors[0].message ??
+        graphQLErrors?.[0]?.message ??
         networkError?.message ??
         t('Store Location & Zone fetch failed'),
       duration: 2500,

@@ -31,14 +31,16 @@ export const ProfileProvider: React.FC<IProfileProviderProps> = ({
       enabled: !!restaurantId,
       fetchPolicy: 'network-only',
       debounceMs: 300,
+      errorPolicy: 'all', // Return partial data even if there are errors
       onCompleted: () => {
         // You can perform any actions with the fetched data here
       },
-      onError: () => {
+      onError: (error) => {
+        console.error('Error fetching restaurant profile:', error);
         showToast({
           type: 'error',
           title: 'Profile Fetch',
-          message: 'Failed to fetch profile',
+          message: error.message || 'Failed to fetch profile',
         });
       },
     }

@@ -11,10 +11,15 @@ import { IDateFilter } from '@/lib/utils/interfaces';
 import { useState } from 'react';
 
 export default function AdminRestaurantDashboard() {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const currentDay = String(currentDate.getDate()).padStart(2, '0');
+
   const [dateFilter, setDateFilter] = useState<IDateFilter>({
     dateKeyword: 'All',
-    startDate: `${new Date().getFullYear()}-01-01`, // Current year, January 1st
-    endDate: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()).padStart(2, '0')}`, // Last day of the current month
+    startDate: `${currentYear}-01-01`, // Current year, January 1st
+    endDate: `${currentYear}-${currentMonth}-${currentDay}`, // Current date
   });
 
   const handleDateFilter = (dateFilter: IDateFilter) => {

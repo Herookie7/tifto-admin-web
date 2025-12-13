@@ -44,9 +44,14 @@ const TimingAddForm = () => {
   const t = useTranslations();
   const { showToast } = useToast();
 
-  const { data, loading, refetch } = useQuery(GET_RESTAURANT_PROFILE, {
+  const { data, loading, error, refetch } = useQuery(GET_RESTAURANT_PROFILE, {
     fetchPolicy: 'cache-and-network',
     variables: { id: restaurantId },
+    errorPolicy: 'all', // Return partial data even if there are errors
+    skip: !restaurantId, // Skip query if restaurantId is not available
+    onError: (error) => {
+      console.error('Error fetching restaurant profile for timing:', error);
+    },
   });
 
   //for conversion from ["HH","MM"] to 'HH:MM' format
@@ -121,6 +126,21 @@ const TimingAddForm = () => {
       },
     });
   };
+
+  if (error) {
+    return (
+      <div className="mt-7 max-h-[calc(100vh-152px)] overflow-auto rounded border px-8 py-8">
+        <div className="flex items-center justify-center p-10 text-red-500">
+          <div className="text-center">
+            <p className="text-lg font-semibold">{t('Error')}</p>
+            <p className="text-sm mt-2">
+              {error.message || t('Failed to load timing data')}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-7 max-h-[calc(100vh-152px)] overflow-auto rounded border px-8 py-8">
