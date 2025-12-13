@@ -23,10 +23,11 @@ export default function GrowthOverView() {
   const [chartOptions, setChartOptions] = useState({});
 
   // Query
+  const currentYear = new Date().getFullYear();
   const { data, loading } = useQueryGQL(
     GET_DASHBOARD_USERS_BY_YEAR,
     {
-      year: new Date().getFullYear(),
+      year: Number(currentYear), // Ensure it's explicitly a number/Int
     },
     {
       fetchPolicy: 'network-only',

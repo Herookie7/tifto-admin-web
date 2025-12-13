@@ -25,7 +25,11 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   // Ensure GraphQL URL is correctly formatted (no double slashes)
   const graphqlUrl = `${SERVER_URL.replace(/\/$/, '')}/graphql`;
   // Ensure WebSocket URL is correctly formatted
-  const wsGraphqlUrl = `${WS_SERVER_URL.replace(/\/$/, '')}/graphql`;
+  // If WS_SERVER_URL already ends with /graphql, don't append it again
+  let wsGraphqlUrl = WS_SERVER_URL.replace(/\/$/, '');
+  if (!wsGraphqlUrl.endsWith('/graphql')) {
+    wsGraphqlUrl = `${wsGraphqlUrl}/graphql`;
+  }
   
   // Debug: Log the URLs being used (remove in production if needed)
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {

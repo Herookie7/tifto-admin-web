@@ -75,7 +75,7 @@ export const useConfiguration = () => {
     process.env.NEXT_PUBLIC_WS_SERVER_URL ??
     process.env.NEXT_PUBLIC_SOCKET_URL ??
     process.env.SOCKET_URL ??
-    'wss://ftifto-backend.onrender.com';
+    'wss://ftifto-backend.onrender.com/graphql';
 
   const SERVER_URL =
     process.env.NEXT_PUBLIC_SERVER_URL ?? deriveHttpOrigin(envServerRest);
