@@ -13,7 +13,7 @@ import {
 import Image from 'next/image';
 
 // Hooks
-import { memo, useCallback, useContext, useState } from 'react';
+import { memo, useCallback, useContext, useState, useEffect } from 'react';
 
 // Utils
 import { compressImage } from '@/lib/utils/methods';
@@ -68,6 +68,8 @@ function CustomUploadImageComponent({
     bool: false,
     msg: '',
   });
+  const [uploadMode, setUploadMode] = useState<'upload' | 'link'>('upload');
+  const [imageLink, setImageLink] = useState('');
 
   // Hooks
   const t = useTranslations();
@@ -153,6 +155,7 @@ function CustomUploadImageComponent({
   const handleCancelClick = (type: String) => {
     if (type === 'cancel') {
       setImageFile('');
+      setImageLink('');
       setImageValidationErr({
         bool: false,
         msg: '',
@@ -162,18 +165,173 @@ function CustomUploadImageComponent({
       return;
     }
   };
+
+  // Validate and set image link
+  const handleLinkSubmit = useCallback(() => {
+    if (!imageLink.trim()) {
+      setImageValidationErr({
+        bool: true,
+        msg: t('Please enter an image URL'),
+      });
+      return;
+    }
+
+    const trimmedLink = imageLink.trim();
+    
+    // Accept data URLs (base64 images)
+    if (trimmedLink.startsWith('data:image/')) {
+      onSetImageUrl(name, trimmedLink);
+      setImageValidationErr({
+        bool: false,
+        msg: '',
+      });
+      showToast({
+        type: 'info',
+        title: title,
+        message: t('Image link has been set successfully'),
+        duration: 2500,
+      });
+      return;
+    }
+
+    // Validate HTTP/HTTPS URLs
+    try {
+      const url = new URL(trimmedLink);
+      
+      // Accept any valid HTTP/HTTPS URL (MongoDB stores as string)
+      // This allows flexibility for various image hosting services
+      if (url.protocol === 'http:' || url.protocol === 'https:') {
+        onSetImageUrl(name, trimmedLink);
+        setImageValidationErr({
+          bool: false,
+          msg: '',
+        });
+        showToast({
+          type: 'info',
+          title: title,
+          message: t('Image link has been set successfully'),
+          duration: 2500,
+        });
+      } else {
+        throw new Error('Invalid URL protocol');
+      }
+    } catch (error) {
+      setImageValidationErr({
+        bool: true,
+        msg: t('Please enter a valid image URL'),
+      });
+      onSetImageUrl(name, '');
+    }
+  }, [imageLink, name, onSetImageUrl, showToast, title, t]);
+
+  // Initialize image link when existingImageUrl changes
+  useEffect(() => {
+    if (existingImageUrl && uploadMode === 'link') {
+      setImageLink(existingImageUrl);
+    }
+  }, [existingImageUrl, uploadMode]);
+
+  // Handle mode change
+  const handleModeChange = (mode: 'upload' | 'link') => {
+    setUploadMode(mode);
+    setImageFile('');
+    setImageValidationErr({
+      bool: false,
+      msg: '',
+    });
+    if (mode === 'link' && existingImageUrl) {
+      setImageLink(existingImageUrl);
+    } else if (mode === 'link' && !existingImageUrl) {
+      setImageLink('');
+    }
+  };
   return (
     <div className="flex flex-col items-center justify-center gap-3">
       <span className="mx-auto self-start text-sm font-[600]">{title}</span>
-      <div
-        style={style}
-        className={
-          page && page === 'vendor-profile-edit'
-            ? `bg-transparnt`
-            : `mx-auto flex h-48 w-48 flex-col items-center justify-start border-2 border-dashed ${imageValidationErr.bool ? 'border-red-900' : 'border-gray-300'}`
-        }
-        // className="bg-transparnt"
-      >
+      
+      {/* Mode Toggle */}
+      <div className="flex gap-2 w-full mb-2">
+        <button
+          type="button"
+          onClick={() => handleModeChange('upload')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            uploadMode === 'upload'
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {t('Upload Image')}
+        </button>
+        <button
+          type="button"
+          onClick={() => handleModeChange('link')}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            uploadMode === 'link'
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {t('Paste Link')}
+        </button>
+      </div>
+
+      {uploadMode === 'link' ? (
+        /* Link Input Mode */
+        <div className="w-full flex flex-col gap-2">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={imageLink}
+              onChange={(e) => setImageLink(e.target.value)}
+              placeholder={t('Enter image URL (e.g., https://example.com/image.jpg)')}
+              className={`flex-1 px-3 py-2 border rounded-md ${
+                imageValidationErr.bool ? 'border-red-500' : 'border-gray-300'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleLinkSubmit();
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleLinkSubmit}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            >
+              {t('Set Link')}
+            </button>
+          </div>
+          {imageValidationErr.bool && (
+            <p className="text-xs text-red-600">{imageValidationErr.msg}</p>
+          )}
+          {(existingImageUrl || imageLink) && !imageValidationErr.bool && (
+            <div className="mt-2 w-full h-48 border border-gray-300 rounded-md overflow-hidden">
+              <Image
+                src={existingImageUrl || imageLink}
+                alt="Preview"
+                width={400}
+                height={300}
+                className="w-full h-full object-contain"
+                onError={() => {
+                  setImageValidationErr({
+                    bool: true,
+                    msg: t('Failed to load image. Please check the URL.'),
+                  });
+                }}
+              />
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Upload Mode */
+        <div
+          style={style}
+          className={
+            page && page === 'vendor-profile-edit'
+              ? `bg-transparnt`
+              : `mx-auto flex h-48 w-48 flex-col items-center justify-start border-2 border-dashed ${imageValidationErr.bool ? 'border-red-900' : 'border-gray-300'}`
+          }
+        >
         <FileUpload
           accept={fileTypes?.join(',')}
           id={`${name}-upload`}
@@ -309,10 +467,13 @@ function CustomUploadImageComponent({
             );
           }}
         />
-      </div>
-      <div className="mx-auto text-[10px] font-[600] text-red-800">
-        {imageValidationErr.msg}
-      </div>
+        </div>
+      )}
+      {uploadMode === 'upload' && (
+        <div className="mx-auto text-[10px] font-[600] text-red-800">
+          {imageValidationErr.msg}
+        </div>
+      )}
     </div>
   );
 }

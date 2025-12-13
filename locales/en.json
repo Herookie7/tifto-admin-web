@@ -1041,5 +1041,12 @@
   "Thursday": "Thursday",
   "Friday": "Friday",
   "Saturday": "Saturday",
-  "Sunday": "Sunday"
+  "Sunday": "Sunday",
+  "Paste Link": "Paste Link",
+  "Set Link": "Set Link",
+  "Enter image URL (e.g., https://example.com/image.jpg)": "Enter image URL (e.g., https://example.com/image.jpg)",
+  "Image link has been set successfully": "Image link has been set successfully",
+  "Please enter an image URL": "Please enter an image URL",
+  "Please enter a valid image URL": "Please enter a valid image URL",
+  "Failed to load image. Please check the URL.": "Failed to load image. Please check the URL."
 }
