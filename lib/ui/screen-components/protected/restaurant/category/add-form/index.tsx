@@ -210,20 +210,12 @@ export default function CategoryAddForm({
           },
         });
       } else {
-        // Create category - use CategoryInput format
-        const categoryInput: any = {
-          title: values.title,
-          restaurant: restaurantId,
-        };
-        
-        // Only include image if shopType is grocery
-        if (shopType == 'grocery' && values?.image) {
-          categoryInput.image = values.image;
-        }
-        
+        // Create category - use individual parameters
         await createCategory({
           variables: {
-            category: categoryInput,
+            restaurantId: restaurantId,
+            title: values.title,
+            image: shopType == 'grocery' ? (values?.image ?? '') : undefined,
           },
         });
       }

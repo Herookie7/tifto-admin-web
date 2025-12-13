@@ -24,7 +24,7 @@ export default function GrowthOverView() {
 
   // Query
   const currentYear = new Date().getFullYear();
-  const { data, loading } = useQueryGQL(
+  const { data, loading, error } = useQueryGQL(
     GET_DASHBOARD_USERS_BY_YEAR,
     {
       year: Number(currentYear), // Ensure it's explicitly a number/Int
@@ -32,6 +32,8 @@ export default function GrowthOverView() {
     {
       fetchPolicy: 'network-only',
       debounceMs: 300,
+      // Skip query if there's a known schema mismatch error
+      errorPolicy: 'all', // Return partial data even if there are errors
     }
   ) as IQueryResult<
     IDashboardUsersByYearResponseGraphQL | undefined,
@@ -39,6 +41,21 @@ export default function GrowthOverView() {
   >;
 
   const dashboardUsersByYear = useMemo(() => {
+    // Handle GraphQL errors gracefully - backend schema mismatch issue
+    if (error) {
+      console.warn(
+        'GraphQL error in getDashboardUsersByYear (known schema mismatch issue):',
+        error
+      );
+      // Return empty data structure to prevent crashes
+      return {
+        usersCount: new Array(12).fill(0),
+        vendorsCount: new Array(12).fill(0),
+        restaurantsCount: new Array(12).fill(0),
+        ridersCount: new Array(12).fill(0),
+      };
+    }
+
     if (!data) return null;
     
     // Helper to normalize values to arrays - handle both array and single Int responses
@@ -64,7 +81,7 @@ export default function GrowthOverView() {
       restaurantsCount: normalizeToArray(response.restaurantsCount),
       ridersCount: normalizeToArray(response.ridersCount),
     };
-  }, [data]);
+  }, [data, error]);
 
   // Handlers
   const onChartDataChange = () => {

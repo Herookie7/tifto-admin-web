@@ -36,20 +36,33 @@ export const VendorProvider = ({ children }: IProvider) => {
 
   // API
 
-  const vendorResponse = useQueryGQL(GET_VENDORS, {
-    debounceMs: 300,
-    onCompleted: (data: unknown) => {
-      const _data = data as IVendorResponseGraphQL;
-      setVendorId(_data?.vendors[0]?._id ?? '');
-      onUseLocalStorage(
-        'save',
-        SELECTED_VENDOR_EMAIL,
-        _data?.vendors[0]?.email
-      );
-      setFiltered(_data.vendors);
-      // Ensure filtered list updates
-    },
-  }) as IQueryResult<IVendorResponseGraphQL | undefined, undefined>;
+  const vendorResponse = useQueryGQL(
+    GET_VENDORS,
+    {},
+    {
+      debounceMs: 300,
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onCompleted: (data: unknown) => {
+        const _data = data as IVendorResponseGraphQL;
+        if (_data?.vendors && _data.vendors.length > 0) {
+          setVendorId(_data?.vendors[0]?._id ?? '');
+          onUseLocalStorage(
+            'save',
+            SELECTED_VENDOR_EMAIL,
+            _data?.vendors[0]?.email
+          );
+          setFiltered(_data.vendors);
+        } else {
+          setFiltered([]);
+        }
+        // Ensure filtered list updates
+      },
+      onError: (error) => {
+        console.error('Error fetching vendors:', error);
+        setFiltered([]);
+      },
+    }
+  ) as IQueryResult<IVendorResponseGraphQL | undefined, undefined>;
 
   // State Handler
   const onSetVendorFormVisible = (status: boolean, isEdit?: boolean) => {

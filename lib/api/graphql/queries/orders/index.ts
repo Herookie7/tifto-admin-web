@@ -149,8 +149,8 @@ export const GET_ORDER_BY_RESTAURANT = gql`
 `;
 
 export const GET_ORDER_BY_RESTAURANT_WITHOUT_PAGINATION = gql`
-  query ordersByRestIdWithoutPagination($restaurant: String!, $search: String) {
-    ordersByRestIdWithoutPagination(restaurant: $restaurant, search: $search) {
+  query ordersByRestIdWithoutPagination($restaurantId: String!) {
+    ordersByRestIdWithoutPagination(restaurantId: $restaurantId) {
       _id
       orderId
       deliveryAddress {

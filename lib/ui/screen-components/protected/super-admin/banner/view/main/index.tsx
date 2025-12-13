@@ -43,8 +43,9 @@ export default function BannersMain({
   );
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [selectedActions, setSelectedActions] = useState<string[]>([]);
-  const [currentPage] = useState(1);
-  const [pageSize] = useState(10);
+  // Note: Pagination variables removed since GET_BANNERS query doesn't support pagination
+  // const [currentPage] = useState(1);
+  // const [pageSize] = useState(10);
 
   const filters = {
     global: { value: globalFilterValue, matchMode: FilterMatchMode.CONTAINS },
@@ -58,16 +59,19 @@ export default function BannersMain({
   const {
     data,
     loading,
+    error,
     refetch: refetchBanners,
-  } = useQuery<
-    IBannersDataResponse,
-    { page: number; rowsPerPage: number; search: string }
-  >(GET_BANNERS, {
+  } = useQuery<IBannersDataResponse>(GET_BANNERS, {
     fetchPolicy: 'cache-and-network',
-    variables: {
-      page: currentPage,
-      rowsPerPage: pageSize,
-      search: '',
+    errorPolicy: 'all', // Return partial data even if there are errors
+    onError: (error) => {
+      console.error('Error fetching banners:', error);
+      showToast({
+        type: 'error',
+        title: t('Error'),
+        message: error.message || t('Failed to load banners'),
+        duration: 3000,
+      });
     },
   });
 
@@ -80,6 +84,15 @@ export default function BannersMain({
           query: GET_BANNERS,
         },
       ],
+      onError: (error) => {
+        console.error('Error deleting banner:', error);
+        showToast({
+          type: 'error',
+          title: t('Error'),
+          message: error.message || t('Failed to delete banner'),
+          duration: 3000,
+        });
+      },
     }
   );
 
@@ -111,12 +124,9 @@ export default function BannersMain({
 
   // UseEffects
   useEffect(() => {
-    refetchBanners({
-      page: currentPage,
-      rowsPerPage: pageSize,
-      search: '',
-    });
-  }, [currentPage]);
+    refetchBanners();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only refetch on mount, not on page change since query doesn't support pagination
   return (
     <div className="p-3">
       <Table

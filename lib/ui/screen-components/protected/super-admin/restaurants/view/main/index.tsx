@@ -92,18 +92,35 @@ export default function RestaurantsMain() {
   };
 
   //Query
-  const { data, loading, refetch } = useQueryGQL(
+  const { data, loading, error, refetch } = useQueryGQL(
     currentTab === 'Actual' ? GET_RESTAURANTS_PAGINATED : GET_CLONED_RESTAURANTS_PAGINATED,
     queryVariables,
     {
       fetchPolicy: 'cache-and-network',
       debounceMs: 300,
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onError: (error) => {
+        console.error('Error fetching restaurants:', error);
+        showToast({
+          type: 'error',
+          title: t('Error'),
+          message: error.message || t('Failed to load restaurants'),
+          duration: 3000,
+        });
+      },
     }
   ) as IQueryResult<IRestaurantsResponseGraphQL | undefined, undefined>;
 
   useEffect(() => {
-    console.log("🚀 Store Screen Rendered");
-  });
+    console.log("🚀 Store Screen Rendered", { 
+      currentTab, 
+      data, 
+      loading, 
+      error: error?.message,
+      restaurantsCount: restaurants.length,
+      totalRecords 
+    });
+  }, [currentTab, data, loading, error, restaurants.length, totalRecords]);
 
   // API
   const [hardDeleteRestaurant, { loading: isHardDeleting }] = useMutation(

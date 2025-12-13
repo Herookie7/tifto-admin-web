@@ -49,9 +49,23 @@ export default function StaffMain({
   });
 
   // Query
-  const { data, loading } = useQueryGQL(GET_STAFFS, {
-    fetchPolicy: 'cache-and-network',
-  }) as IQueryResult<IStaffGQLResponse | undefined, undefined>;
+  const { data, loading, error } = useQueryGQL(
+    GET_STAFFS,
+    {},
+    {
+      fetchPolicy: 'cache-and-network',
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onError: (error) => {
+        console.error('Error fetching staff:', error);
+        showToast({
+          type: 'error',
+          title: t('Error'),
+          message: error.message || t('Failed to load staff'),
+          duration: 3000,
+        });
+      },
+    }
+  ) as IQueryResult<IStaffGQLResponse | undefined, undefined>;
 
   // For global search
   const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {

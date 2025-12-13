@@ -35,23 +35,26 @@ export default function CuisinesMain({
   isEditing,
   setIsEditing,
 }: ICuisineMainProps) {
+  // Hooks
+  const t = useTranslations();
+  const { showToast } = useContext(ToastContext);
+
   // Mutations
   const [deleteCuisine, { loading: deleteCuisineLoading }] = useMutation(
     DELETE_CUISINE,
     {
       refetchQueries: [{ query: GET_CUISINES }],
       fetchPolicy: 'network-only',
+      onError: (err) => {
+        showToast({
+          title: t('Delete Cuisine'),
+          type: 'error',
+          message: err.message || t('Cuisine Deletion Failed'),
+          duration: 2000,
+        });
+      },
     }
   );
-
-  // Queries
-  const { data, fetch } = useLazyQueryQL(GET_CUISINES, {
-    onCompleted: () => setIsLoading(false),
-  }) as ILazyQueryResult<IGetCuisinesData | undefined, undefined>;
-
-  // Hooks
-  const t = useTranslations();
-  const { showToast } = useContext(ToastContext);
 
   // States
   const [selectedData, setSelectedData] = useState<ICuisine[]>([]);
@@ -69,6 +72,16 @@ export default function CuisinesMain({
   const [selectedActions, setSelectedActions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
+
+  // Queries
+  const { data, fetch, error } = useLazyQueryQL(GET_CUISINES, {
+    fetchPolicy: 'network-only',
+    debounceMs: 300, // Reduced debounce for better responsiveness
+    onCompleted: () => {
+      setIsLoading(false);
+      console.log('Cuisines loaded successfully:', data?.cuisines?.length ?? 0);
+    },
+  }) as ILazyQueryResult<IGetCuisinesData | undefined, undefined>;
 
   // Filters
   const filters = {
@@ -159,11 +172,26 @@ export default function CuisinesMain({
   // UseEffects
   useEffect(() => {
     setVisible(isEditing.bool);
-  }, [data, isEditing.bool]);
+  }, [isEditing.bool, setVisible]);
 
   useEffect(() => {
     onFetchCuisines();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      console.error('Error fetching cuisines:', error);
+      setIsLoading(false);
+      showToast({
+        title: t('Error'),
+        type: 'error',
+        message: error.message || t('Failed to load cuisines'),
+        duration: 3000,
+      });
+    }
+  }, [error, showToast, t]);
 
   return (
     <div className="p-3">

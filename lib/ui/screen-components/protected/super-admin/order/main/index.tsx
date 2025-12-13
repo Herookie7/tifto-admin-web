@@ -34,10 +34,16 @@ export default function OrderSuperAdminMain() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] =
     useState<IExtendedOrder | null>(null);
+  // Fix date filter initialization - use current date for endDate
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0'); // +1 because getMonth() is 0-indexed
+  const currentDay = String(currentDate.getDate()).padStart(2, '0');
+  
   const [dateFilter, setDateFilter] = useState<IDateFilter>({
     dateKeyword: 'All',
-    startDate: `${new Date().getFullYear()}-01-01`, // Current year, January 1st
-    endDate: `${new Date().getFullYear()}-${String(new Date().getMonth()).padStart(2, '0')}-${String(new Date(new Date().getFullYear(), new Date().getMonth(), 0).getDate()).padStart(2, '0')}`, // Last day of previous month
+    startDate: `${currentYear}-01-01`, // Current year, January 1st
+    endDate: `${currentYear}-${currentMonth}-${currentDay}`, // Current date
   });
 
   const handleDateFilter = (dateFilter: IDateFilter) => {
@@ -58,6 +64,10 @@ export default function OrderSuperAdminMain() {
     },
     {
       fetchPolicy: 'network-only',
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onError: (error) => {
+        console.error('Error fetching orders:', error);
+      },
     }
   ) as IQueryResult<
     { allOrdersWithoutPagination: IOrder[] } | undefined,

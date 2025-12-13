@@ -21,6 +21,7 @@ export const useQueryGQL = <
     debounceMs?: number;
     pollInterval?: number;
     fetchPolicy?: WatchQueryFetchPolicy;
+    errorPolicy?: 'none' | 'ignore' | 'all';
     retry?: number;
     retryDelayMs?: number;
     onCompleted?: (data: NoInfer<T>) => void;
@@ -32,6 +33,7 @@ export const useQueryGQL = <
     debounceMs = 500,
     pollInterval,
     fetchPolicy,
+    errorPolicy,
     retry = 3,
     retryDelayMs = 1000,
     onCompleted,
@@ -42,6 +44,7 @@ export const useQueryGQL = <
     variables,
     skip: !enabled,
     fetchPolicy,
+    errorPolicy,
     pollInterval,
     onCompleted,
     onError,

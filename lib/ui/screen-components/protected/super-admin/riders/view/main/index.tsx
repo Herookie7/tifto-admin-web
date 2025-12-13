@@ -56,10 +56,22 @@ export default function RidersMain({
   });
 
   // Query
-  const { data, loading } = useQueryGQL(GET_RIDERS, {}) as IQueryResult<
-    IRidersDataResponse | undefined,
-    undefined
-  >;
+  const { data, loading, error } = useQueryGQL(
+    GET_RIDERS,
+    {},
+    {
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onError: (error) => {
+        console.error('Error fetching riders:', error);
+        showToast({
+          type: 'error',
+          title: t('Error'),
+          message: error.message || t('Failed to load riders'),
+          duration: 3000,
+        });
+      },
+    }
+  ) as IQueryResult<IRidersDataResponse | undefined, undefined>;
 
   //Mutation
   const [mutateDelete, { loading: mutationLoading }] = useMutation(

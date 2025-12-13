@@ -34,9 +34,23 @@ export default function UsersMain({
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const { data, loading } = useQuery<IUsersDataResponse>(GET_USERS, {
+  const { data, loading, error } = useQuery<IUsersDataResponse>(GET_USERS, {
     fetchPolicy: 'network-only',
+    errorPolicy: 'all', // Return partial data even if there are errors
+    onError: (error) => {
+      console.error('Error fetching users:', error);
+    },
   });
+
+  // Handle errors gracefully
+  React.useEffect(() => {
+    if (error) {
+      console.error('Error fetching users:', error);
+    }
+    if (data) {
+      console.log('Users data loaded:', { count: data?.users?.length ?? 0 });
+    }
+  }, [data, error]);
 
   const allUsers: IUserResponse[] = useMemo(() => data?.users ?? [], [data]);
 

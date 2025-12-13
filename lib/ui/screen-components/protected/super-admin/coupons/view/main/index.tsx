@@ -78,10 +78,13 @@ export default function CouponsMain({
   };
 
   // Queries
-  const { data, fetch } = useLazyQueryQL(GET_COUPONS, {
+  const { data, fetch, error } = useLazyQueryQL(GET_COUPONS, {
     fetchPolicy: 'network-only',
-    debounceMs: 5000,
-    onCompleted: () => setIsLoading(false),
+    debounceMs: 300, // Reduced from 5000ms for better responsiveness
+    onCompleted: () => {
+      setIsLoading(false);
+      console.log('Coupons loaded successfully:', data?.coupons?.length ?? 0);
+    },
   }) as ILazyQueryResult<IGetCouponsData | undefined, undefined>;
 
   // Mutations
@@ -170,12 +173,27 @@ export default function CouponsMain({
     } else {
       setVisible(false);
     }
-  }, [data, isEditing.bool]);
+  }, [isEditing.bool, setVisible]);
 
   useEffect(() => {
-    fetch();
     setIsLoading(true);
-  }, []);
+    fetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      console.error('Error fetching coupons:', error);
+      setIsLoading(false);
+      showToast({
+        title: t('Error'),
+        type: 'error',
+        message: error.message || t('Failed to load coupons'),
+        duration: 3000,
+      });
+    }
+  }, [error, showToast, t]);
 
   return (
     <div className="p-3">

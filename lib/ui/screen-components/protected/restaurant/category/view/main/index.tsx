@@ -102,10 +102,6 @@ export default function CategoryMain({
   const [deleteCategory, { loading: mutationLoading }] = useMutation(
     DELETE_CATEGORY,
     {
-      variables: {
-        id: deleteId,
-        restaurant: restaurantId,
-      },
       refetchQueries: [
         {
           query: GET_CATEGORY_BY_RESTAURANT_ID,

@@ -124,7 +124,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
   const { loading: isFetchingRestaurantDeliveryZoneInfo } = useQuery(
     GET_RESTAURANT_DELIVERY_ZONE_INFO,
     {
-      variables: { id: restaurantsContextData?.restaurant?._id?.code ?? '' },
+      variables: { restaurantId: restaurantsContextData?.restaurant?._id?.code ?? '' },
       fetchPolicy: 'network-only',
       skip: !restaurantsContextData?.restaurant?._id?.code,
       onCompleted: onRestaurantZoneInfoFetchCompleted,
