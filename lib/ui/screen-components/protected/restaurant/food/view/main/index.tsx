@@ -139,6 +139,16 @@ export default function FoodsMain() {
       setDeleteId({ id: '', categoryId: '' });
       refetch();
     },
+    onError: (error) => {
+      console.error('Error deleting food:', error);
+      showToast({
+        type: 'error',
+        title: t('Delete Food'),
+        message: error.message || t('Food deletion failed'),
+        duration: 3000,
+      });
+      setDeleteId({ id: '', categoryId: '' });
+    },
   });
 
   // Memoized Data
@@ -309,7 +319,7 @@ export default function FoodsMain() {
         }}
         onConfirm={() => {
           deleteFood({
-            variables: { ...deleteId, restaurant: restaurantId },
+            variables: { id: deleteId.id },
           });
         }}
         message={t('Are you sure you want to delete this option?')}

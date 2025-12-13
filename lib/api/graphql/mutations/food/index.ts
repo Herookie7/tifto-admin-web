@@ -61,13 +61,7 @@ export const EDIT_FOOD = gql`
 `;
 
 export const DELETE_FOOD = gql`
-  mutation DeleteFood(
-    $id: String!
-    $restaurant: String!
-    $categoryId: String!
-  ) {
-    deleteFood(id: $id, restaurant: $restaurant, categoryId: $categoryId) {
-      _id
-    }
+  mutation DeleteFood($id: ID!) {
+    deleteProduct(id: $id)
   }
 `;

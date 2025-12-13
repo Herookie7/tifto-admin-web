@@ -7,10 +7,12 @@ import { useContext, useEffect, useMemo, useState } from 'react';
 // Context
 import { FoodsContext } from '@/lib/context/restaurant/foods.context';
 import { RestaurantLayoutContext } from '@/lib/context/restaurant/layout-restaurant.context';
+import { ToastContext } from '@/lib/context/global/toast.context';
 
 // Hooks
 import { useQueryGQL } from '@/lib/hooks/useQueryQL';
 import { useTranslations } from 'next-intl';
+import { useMutation } from '@apollo/client';
 
 // Interface and Types
 import {
@@ -22,11 +24,12 @@ import {
   IQueryResult,
   ISubCategory,
   ISubCategoryByParentIdResponse,
+  IVariationForm,
 } from '@/lib/utils/interfaces';
 import { IFoodDetailsForm } from '@/lib/utils/interfaces/forms/food.form.interface';
 
 // Constants and Methods
-import { FoodErrors, MAX_LANSDCAPE_FILE_SIZE } from '@/lib/utils/constants';
+import { FoodErrors, MAX_LANSDCAPE_FILE_SIZE, MAX_PRICE, MIN_PRICE } from '@/lib/utils/constants';
 import { onErrorMessageMatcher } from '@/lib/utils/methods/error';
 
 // Components
@@ -36,13 +39,15 @@ import CustomTextField from '@/lib/ui/useable-components/input-field';
 import CustomDropdownComponent from '@/lib/ui/useable-components/custom-dropdown';
 import CustomTextAreaField from '@/lib/ui/useable-components/custom-text-area-field';
 import CustomUploadImageComponent from '@/lib/ui/useable-components/upload/upload-image';
+import CustomNumberField from '@/lib/ui/useable-components/number-input-field';
+import CustomInputSwitch from '@/lib/ui/useable-components/custom-input-switch';
 
 // API
-import { GET_CATEGORY_BY_RESTAURANT_ID } from '@/lib/api/graphql';
+import { GET_CATEGORY_BY_RESTAURANT_ID, CREATE_FOOD, EDIT_FOOD, GET_FOODS_BY_RESTAURANT_ID } from '@/lib/api/graphql';
 import { GET_SUBCATEGORIES_BY_PARENT_ID } from '@/lib/api/graphql/queries/sub-categories';
 
 // Schema
-import { FoodSchema } from '@/lib/utils/schema';
+import * as Yup from 'yup';
 
 // Prime React
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
@@ -54,19 +59,57 @@ import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import TextIconClickable from '@/lib/ui/useable-components/text-icon-clickable';
 import InputSkeleton from '@/lib/ui/useable-components/custom-skeletons/inputfield.skeleton';
 
-const initialValues: IFoodDetailsForm = {
+// Extended form interface with price fields
+interface ISimplifiedFoodForm extends IFoodDetailsForm {
+  price: number;
+  discounted: number;
+  isOutOfStock: boolean;
+}
+
+const initialValues: ISimplifiedFoodForm = {
   _id: null,
   title: '',
   description: '',
   image: '',
   category: null,
   subCategory: null,
+  price: 0,
+  discounted: 0,
+  isOutOfStock: false,
 };
+
+// Simplified schema - subcategory is optional
+const SimplifiedFoodSchema = Yup.object().shape({
+  title: Yup.string()
+    .max(35)
+    .trim()
+    .matches(/\S/, 'Name cannot be only spaces')
+    .required('Required'),
+  description: Yup.string()
+    .max(200)
+    .trim()
+    .matches(/\S/, 'Name cannot be only spaces')
+    .nullable(),
+  category: Yup.mixed<IDropdownSelectItem>().required('Required'),
+  subCategory: Yup.mixed<IDropdownSelectItem>().nullable().optional(),
+  image: Yup.string().url('Invalid image URL').required('Required'),
+  price: Yup.number()
+    .min(MIN_PRICE, `Price must be at least ${MIN_PRICE}`)
+    .max(MAX_PRICE, `Price must be at most ${MAX_PRICE}`)
+    .required('Price is required'),
+  discounted: Yup.number()
+    .min(0, 'Discount cannot be negative')
+    .max(MAX_PRICE, 'Discount is too high')
+    .nullable(),
+  isOutOfStock: Yup.boolean(),
+});
+
 export default function FoodDetails({
   stepperProps,
 }: IFoodDetailsComponentProps) {
   // Hooks
   const t = useTranslations();
+  const { showToast } = useContext(ToastContext);
 
   // Props
   const { onStepChange, order } = stepperProps ?? {
@@ -76,7 +119,7 @@ export default function FoodDetails({
   };
 
   // Context
-  const { onSetFoodContextData, foodContextData } = useContext(FoodsContext);
+  const { onSetFoodContextData, foodContextData, onClearFoodData } = useContext(FoodsContext);
   const { isAddSubCategoriesVisible, setIsAddSubCategoriesVisible } =
     useContext(RestaurantLayoutContext);
   const {
@@ -92,9 +135,15 @@ export default function FoodDetails({
   const [category, setCategory] = useState<ICategory | null>(null);
   const [categoryDropDown, setCategoryDropDown] =
     useState<IDropdownSelectItem>();
-  const [foodInitialValues, setFoodInitialValues] = useState(
+  const [foodInitialValues, setFoodInitialValues] = useState<ISimplifiedFoodForm>(
     foodContextData?.isEditing || foodContextData?.food?.data?.title
-      ? { ...initialValues, ...foodContextData?.food?.data }
+      ? {
+          ...initialValues,
+          ...foodContextData?.food?.data,
+          price: foodContextData?.food?.variations?.[0]?.price ?? 0,
+          discounted: foodContextData?.food?.variations?.[0]?.discounted ?? 0,
+          isOutOfStock: foodContextData?.food?.variations?.[0]?.isOutOfStock ?? false,
+        }
       : { ...initialValues }
   );
 
@@ -130,6 +179,40 @@ export default function FoodDetails({
     { parentCategoryId: string }
   >;
 
+  // Mutation
+  const [createFood, { loading: mutationLoading }] = useMutation(
+    foodContextData?.isEditing ? EDIT_FOOD : CREATE_FOOD,
+    {
+      refetchQueries: [
+        {
+          query: GET_FOODS_BY_RESTAURANT_ID,
+          variables: { id: restaurantId },
+        },
+      ],
+      onCompleted: () => {
+        showToast({
+          type: 'success',
+          title: `${foodContextData?.isEditing ? t('Edit') : t('New')} ${t('Food')}`,
+          message: `${t('Food has been')} ${foodContextData?.isEditing ? t('edited') : t('added')} ${t('successfully')}.`,
+        });
+        onClearFoodData();
+      },
+      onError: (error) => {
+        let message = '';
+        try {
+          message = error.graphQLErrors?.[0]?.message || error.message;
+        } catch (err) {
+          message = t('Something went wrong');
+        }
+        showToast({
+          type: 'error',
+          title: t('New Food'),
+          message,
+        });
+      },
+    }
+  );
+
   // Memoized Data
   const categoriesDropdown = useMemo(
     () =>
@@ -150,34 +233,40 @@ export default function FoodDetails({
   );
 
   // Handlers
-  const onFoodSubmitHandler = (values: IFoodDetailsForm) => {
-    const foodData: IFoodNew = {
-      _id: foodContextData?.food?.data?._id ?? '',
-      title: values.title,
-      description: values.description,
-      category: values.category,
-      subCategory: values.subCategory,
-      image: values.image,
-      isOutOfStock: false,
-      isActive: true,
-      __typename: foodContextData?.food?.data?.__typename ?? 'Food',
-      variations:
-        (foodContextData?.food?.variations ?? []).length > 0
-          ? (foodContextData?.food?.variations ?? [])
-          : [],
-    };
+  const onFoodSubmitHandler = async (values: ISimplifiedFoodForm) => {
+    try {
+      // Create a simple variation with just price and discount
+      // Backend expects addons as array of strings (IDs)
+      const _variation = {
+        title: values.title, // Use food title as variation title
+        price: values.price,
+        discounted: values.discounted || 0,
+        addons: [] as string[], // Backend expects array of addon IDs (strings), empty for simplified form
+        isOutOfStock: values.isOutOfStock,
+      };
 
-    onSetFoodContextData({
-      food: {
-        _id: '',
-        data: foodData,
-        variations:
-          (foodContextData?.food?.variations ?? []).length > 0
-            ? (foodContextData?.food?.variations ?? [])
-            : [],
-      },
-    });
-    onStepChange(order + 1);
+      const foodInput: any = {
+        _id: foodContextData?.food?.data?._id ?? '',
+        restaurant: restaurantId,
+        title: values.title,
+        description: values.description || '',
+        category: values.category?.code,
+        subCategory: values.subCategory?.code || null,
+        image: values.image,
+        variations: [_variation],
+      };
+
+      // Remove __typename if it exists
+      delete foodInput.__typename;
+
+      await createFood({
+        variables: {
+          foodInput: foodInput,
+        },
+      });
+    } catch (err) {
+      console.error('Error submitting food:', err);
+    }
   };
 
   useEffect(() => {
@@ -191,7 +280,6 @@ export default function FoodDetails({
           })) || [];
       setSelectedSubCategories(selectedSubCategory);
     }
-    // setFoodInitialValues((prev)=>({...prev, subCategory:foodContextData?.food?.data.subCategory||null}))
     refetchCategories();
     refetchSubCategories({
       parentCategoryId: categoryDropDown?.code ?? '',
@@ -213,6 +301,9 @@ export default function FoodDetails({
       setFoodInitialValues({
         ...JSON.parse(JSON.stringify(foodInitialValues)),
         category: editing_category,
+        price: foodContextData?.food?.variations?.[0]?.price ?? 0,
+        discounted: foodContextData?.food?.variations?.[0]?.discounted ?? 0,
+        isOutOfStock: foodContextData?.food?.variations?.[0]?.isOutOfStock ?? false,
       });
       setCategoryDropDown(editing_category ?? ({} as IDropdownSelectItem));
     }
@@ -225,10 +316,10 @@ export default function FoodDetails({
           <div>
             <Formik
               initialValues={foodInitialValues}
-              validationSchema={FoodSchema}
+              validationSchema={SimplifiedFoodSchema}
               enableReinitialize={true}
               onSubmit={async (values) => {
-                onFoodSubmitHandler(values);
+                await onFoodSubmitHandler(values);
               }}
               validateOnChange={false}
             >
@@ -248,7 +339,7 @@ export default function FoodDetails({
                           htmlFor="category"
                           className="text-sm font-[500]"
                         >
-                          {t('Category')}
+                          {t('Category')} <span className="text-red-500">*</span>
                         </label>
                         <Dropdown
                           name="category"
@@ -259,6 +350,7 @@ export default function FoodDetails({
                           onChange={(e: DropdownChangeEvent) => {
                             handleChange(e);
                             setCategoryDropDown(e.value);
+                            setFieldValue('subCategory', null); // Reset subcategory when category changes
                           }}
                           options={categoriesDropdown ?? []}
                           loading={categoriesLoading}
@@ -287,56 +379,60 @@ export default function FoodDetails({
                         />
                       </div>
 
-                      <div>
-                        {!subCategoriesLoading ? (
-                          <CustomDropdownComponent
-                            name="subCategory"
-                            placeholder={t('Select Sub-Category')}
-                            showLabel={true}
-                            extraFooterButton={{
-                              onChange: () => {
-                                setIsAddSubCategoriesVisible((prev) => ({
-                                  bool: !prev.bool,
-                                  parentCategoryId:
-                                    values?.category?.code ?? '',
-                                }));
-                                refetchSubCategories({
-                                  parentCategoryId:
-                                    values?.category?.code ||
-                                    categoryDropDown?.code ||
-                                    '',
-                                });
-                              },
-                              title: t('Add Sub-Category'),
-                            }}
-                            selectedItem={values.subCategory}
-                            setSelectedItem={setFieldValue}
-                            options={
-                              subCategoriesDropdown ??
-                              selectedSubCategories ??
-                              []
-                            }
-                            isLoading={subCategoriesLoading}
-                            style={{
-                              borderColor: onErrorMessageMatcher(
-                                'subCategory',
-                                errors?.subCategory,
-                                FoodErrors
-                              )
-                                ? 'red'
-                                : '',
-                            }}
-                          />
-                        ) : (
-                          <InputSkeleton />
-                        )}
-                      </div>
+                      {/* Subcategory - Optional and less prominent */}
+                      {categoryDropDown && (
+                        <div>
+                          {!subCategoriesLoading ? (
+                            <CustomDropdownComponent
+                              name="subCategory"
+                              placeholder={t('Select Sub-Category (Optional)')}
+                              showLabel={true}
+                              label={t('Sub-Category')}
+                              extraFooterButton={{
+                                onChange: () => {
+                                  setIsAddSubCategoriesVisible((prev) => ({
+                                    bool: !prev.bool,
+                                    parentCategoryId:
+                                      values?.category?.code ?? '',
+                                  }));
+                                  refetchSubCategories({
+                                    parentCategoryId:
+                                      values?.category?.code ||
+                                      categoryDropDown?.code ||
+                                      '',
+                                  });
+                                },
+                                title: t('Add Sub-Category'),
+                              }}
+                              selectedItem={values.subCategory}
+                              setSelectedItem={setFieldValue}
+                              options={
+                                subCategoriesDropdown ??
+                                selectedSubCategories ??
+                                []
+                              }
+                              isLoading={subCategoriesLoading}
+                              style={{
+                                borderColor: onErrorMessageMatcher(
+                                  'subCategory',
+                                  errors?.subCategory,
+                                  FoodErrors
+                                )
+                                  ? 'red'
+                                  : '',
+                              }}
+                            />
+                          ) : (
+                            <InputSkeleton />
+                          )}
+                        </div>
+                      )}
 
                       <div>
                         <CustomTextField
                           type="text"
                           name="title"
-                          placeholder={t('Title')}
+                          placeholder={t('Product Name')}
                           maxLength={35}
                           value={values.title}
                           onChange={handleChange}
@@ -356,7 +452,7 @@ export default function FoodDetails({
                         <CustomTextAreaField
                           name="description"
                           label={t('Description')}
-                          placeholder={t('Description')}
+                          placeholder={t('Description (Optional)')}
                           value={values.description}
                           onChange={handleChange}
                           showLabel={true}
@@ -399,14 +495,70 @@ export default function FoodDetails({
                           }}
                         />
                       </div>
+
+                      {/* Price Fields */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <CustomNumberField
+                            name="price"
+                            min={MIN_PRICE}
+                            max={MAX_PRICE}
+                            minFractionDigits={0}
+                            maxFractionDigits={2}
+                            placeholder={t('Price')}
+                            showLabel={true}
+                            value={values.price}
+                            onChangeFieldValue={setFieldValue}
+                            style={{
+                              borderColor: errors?.price ? 'red' : '',
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <CustomNumberField
+                            name="discounted"
+                            min={0}
+                            placeholder={t('Discount (Optional)')}
+                            showLabel={true}
+                            value={values.discounted}
+                            onChangeFieldValue={setFieldValue}
+                            style={{
+                              borderColor: errors?.discounted ? 'red' : '',
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      {values.discounted > 0 && (
+                        <div className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
+                          <p>
+                            {t('Original Price')}: <span className="line-through">{values.price + values.discounted}</span>
+                          </p>
+                          <p>
+                            {t('Discounted Price')}: <span className="font-semibold">{values.price}</span>
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Out of Stock Toggle */}
+                      <div className="flex justify-end">
+                        <CustomInputSwitch
+                          label={t('Out of Stock')}
+                          loading={false}
+                          isActive={values.isOutOfStock}
+                          onChange={() => {
+                            setFieldValue('isOutOfStock', !values.isOutOfStock);
+                          }}
+                        />
+                      </div>
                     </div>
 
                     <div className="flex justify-end mt-4">
                       <CustomButton
                         className="w-fit h-10 bg-black text-white border-gray-300 px-8"
-                        label={t('Next')}
+                        label={foodContextData?.isEditing ? t('Update') : t('Add Product')}
                         type="submit"
-                        loading={isSubmitting}
+                        loading={isSubmitting || mutationLoading}
                       />
                     </div>
                   </Form>
@@ -425,7 +577,6 @@ export default function FoodDetails({
         }}
         isAddCategoryVisible={isAddCategoryVisible}
         subCategories={subCategories}
-        // Add this prop to trigger refetch after category add/edit
         onCategoryAdded={() => {
           refetchCategories();
         }}
