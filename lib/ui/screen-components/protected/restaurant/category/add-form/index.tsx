@@ -200,17 +200,33 @@ export default function CategoryAddForm({
       return subCategory;
     });
     try {
-      await createCategory({
-        variables: {
-          category: {
-            restaurant: restaurantId,
-            _id: category ? category?._id : '',
+      if (category) {
+        // Edit category - still uses individual parameters
+        await createCategory({
+          variables: {
+            id: category._id,
             title: values.title,
-            subCategories: transformedSubCategories,
-            image: shopType == 'grocery' ? (values?.image ?? '') : '',
+            image: shopType == 'grocery' ? (values?.image ?? '') : undefined,
           },
-        },
-      });
+        });
+      } else {
+        // Create category - use CategoryInput format
+        const categoryInput: any = {
+          title: values.title,
+          restaurant: restaurantId,
+        };
+        
+        // Only include image if shopType is grocery
+        if (shopType == 'grocery' && values?.image) {
+          categoryInput.image = values.image;
+        }
+        
+        await createCategory({
+          variables: {
+            category: categoryInput,
+          },
+        });
+      }
     } catch (error) {
       console.error({ error });
       showToast({
