@@ -79,6 +79,7 @@ export default function FoodsMain() {
   const {
     data: foodsData,
     loading,
+    error,
     refetch,
   } = useQueryGQL(
     GET_FOODS_BY_RESTAURANT_ID,
@@ -86,16 +87,21 @@ export default function FoodsMain() {
     {
       fetchPolicy: 'network-only',
       enabled: !!restaurantId,
+      errorPolicy: 'all', // Return partial data even if there are errors
       onError: onErrorFetchFoodsByRestaurant,
     }
   ) as IQueryResult<IFoodByRestaurantResponse | undefined, undefined>;
 
-  const { data } = useQueryGQL(
+  const { data, error: addonsError } = useQueryGQL(
     GET_ADDONS_BY_RESTAURANT_ID,
     { id: restaurantId },
     {
       fetchPolicy: 'network-only',
       enabled: !!restaurantId,
+      errorPolicy: 'all', // Return partial data even if there are errors
+      onError: (error) => {
+        console.error('Error fetching addons:', error);
+      },
     }
   ) as IQueryResult<IAddonByRestaurantResponse | undefined, undefined>;
   const [fetchSubcategory, { loading: subCategoriesLoading }] = useLazyQuery(
@@ -259,8 +265,20 @@ export default function FoodsMain() {
 
   // Use Effect
   useEffect(() => {
-    onFetchFoodsByRestaurantCompleted();
-  }, [foodsData?.restaurant.categories]);
+    if (foodsData?.restaurant?.categories) {
+      onFetchFoodsByRestaurantCompleted();
+    }
+  }, [foodsData?.restaurant?.categories]);
+
+  // Handle errors
+  useEffect(() => {
+    if (error) {
+      console.error('Error loading foods:', error);
+    }
+    if (addonsError) {
+      console.error('Error loading addons:', addonsError);
+    }
+  }, [error, addonsError]);
 
   return (
     <div className="p-3">
@@ -278,6 +296,11 @@ export default function FoodsMain() {
         loading={loading}
         columns={FOODS_TABLE_COLUMNS({ menuItems })}
       />
+      {error && (
+        <div className="mt-4 text-red-500 text-sm">
+          {t('Error')}: {error.message || t('Failed to load foods')}
+        </div>
+      )}
       <CustomDialog
         loading={mutationLoading}
         visible={!!deleteId?.id}
