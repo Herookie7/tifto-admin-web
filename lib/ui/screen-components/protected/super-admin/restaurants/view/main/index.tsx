@@ -111,17 +111,6 @@ export default function RestaurantsMain() {
     }
   ) as IQueryResult<IRestaurantsResponseGraphQL | undefined, undefined>;
 
-  useEffect(() => {
-    console.log("🚀 Store Screen Rendered", { 
-      currentTab, 
-      data, 
-      loading, 
-      error: error?.message,
-      restaurantsCount: restaurants.length,
-      totalRecords 
-    });
-  }, [currentTab, data, loading, error, restaurants.length, totalRecords]);
-
   // API
   const [hardDeleteRestaurant, { loading: isHardDeleting }] = useMutation(
     HARD_DELETE_RESTAURANT,
@@ -226,6 +215,17 @@ export default function RestaurantsMain() {
 
   const restaurants = restaurantData?.data || [];
   const totalRecords = restaurantData?.total || 0;
+
+  useEffect(() => {
+    console.log("🚀 Store Screen Rendered", { 
+      currentTab, 
+      data, 
+      loading, 
+      error: error?.message,
+      restaurantsCount: restaurants.length,
+      totalRecords 
+    });
+  }, [currentTab, data, loading, error, restaurants.length, totalRecords]);
 
   return (
     <div className="p-3">
