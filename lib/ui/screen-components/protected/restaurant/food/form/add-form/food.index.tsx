@@ -387,7 +387,6 @@ export default function FoodDetails({
                               name="subCategory"
                               placeholder={t('Select Sub-Category (Optional)')}
                               showLabel={true}
-                              label={t('Sub-Category')}
                               extraFooterButton={{
                                 onChange: () => {
                                   setIsAddSubCategoriesVisible((prev) => ({
