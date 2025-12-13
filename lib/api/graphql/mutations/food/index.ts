@@ -1,61 +1,55 @@
 import { gql } from '@apollo/client';
 
 export const CREATE_FOOD = gql`
-  mutation CreateFood($foodInput: FoodInput!) {
-    createFood(foodInput: $foodInput) {
+  mutation CreateProduct($restaurantId: ID!, $categoryId: ID, $productInput: ProductInput!) {
+    createProduct(restaurantId: $restaurantId, categoryId: $categoryId, productInput: $productInput) {
       _id
-      categories {
+      title
+      description
+      image
+      price
+      discountedPrice
+      subCategory
+      isActive
+      available
+      isOutOfStock
+      variations {
         _id
         title
-        foods {
-          _id
-          title
-          description
-          subCategory
-          variations {
-            _id
-            title
-            price
-            discounted
-            addons
-            isOutOfStock
-          }
-          image
-          isActive
-        }
-        createdAt
-        updatedAt
+        price
+        discounted
+        addons
+        isOutOfStock
       }
+      createdAt
+      updatedAt
     }
   }
 `;
 
 export const EDIT_FOOD = gql`
-  mutation EditFood($foodInput: FoodInput!) {
-    editFood(foodInput: $foodInput) {
+  mutation UpdateProduct($id: ID!, $productInput: ProductInput!) {
+    updateProduct(id: $id, productInput: $productInput) {
       _id
-      categories {
+      title
+      description
+      image
+      price
+      discountedPrice
+      subCategory
+      isActive
+      available
+      isOutOfStock
+      variations {
         _id
         title
-        foods {
-          _id
-          title
-          description
-          subCategory
-          variations {
-            _id
-            title
-            price
-            discounted
-            addons
-            isOutOfStock
-          }
-          image
-          isActive
-        }
-        createdAt
-        updatedAt
+        price
+        discounted
+        addons
+        isOutOfStock
       }
+      createdAt
+      updatedAt
     }
   }
 `;

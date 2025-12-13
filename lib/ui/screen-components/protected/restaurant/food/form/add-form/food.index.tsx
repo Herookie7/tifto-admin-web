@@ -237,33 +237,48 @@ export default function FoodDetails({
     try {
       // Create a simple variation with just price and discount
       // Backend expects addons as array of strings (IDs)
+      // Note: isOutOfStock is stored on the product, not the variation
       const _variation = {
         title: values.title, // Use food title as variation title
         price: values.price,
         discounted: values.discounted || 0,
         addons: [] as string[], // Backend expects array of addon IDs (strings), empty for simplified form
-        isOutOfStock: values.isOutOfStock,
       };
 
-      const foodInput: any = {
-        _id: foodContextData?.food?.data?._id ?? '',
-        restaurant: restaurantId,
+      // ProductInput structure matching backend schema
+      // Note: addons in ProductInput is [AddonInput], but we're using empty array for simplified form
+      const productInput: any = {
         title: values.title,
-        description: values.description || '',
-        category: values.category?.code,
-        subCategory: values.subCategory?.code || null,
-        image: values.image,
+        description: values.description || undefined, // Use undefined instead of empty string
+        image: values.image || undefined,
+        price: values.price, // Required field
+        discountedPrice: values.discounted > 0 ? values.discounted : undefined,
+        subCategory: values.subCategory?.code || undefined,
+        isActive: true,
+        available: true,
+        isOutOfStock: values.isOutOfStock,
         variations: [_variation],
+        addons: [], // Empty array for simplified form - backend expects [AddonInput]
       };
 
-      // Remove __typename if it exists
-      delete foodInput.__typename;
-
-      await createFood({
-        variables: {
-          foodInput: foodInput,
-        },
-      });
+      if (foodContextData?.isEditing && foodContextData?.food?.data?._id) {
+        // Update existing product
+        await createFood({
+          variables: {
+            id: foodContextData.food.data._id,
+            productInput: productInput,
+          },
+        });
+      } else {
+        // Create new product
+        await createFood({
+          variables: {
+            restaurantId: restaurantId,
+            categoryId: values.category?.code || null,
+            productInput: productInput,
+          },
+        });
+      }
     } catch (err) {
       console.error('Error submitting food:', err);
     }
