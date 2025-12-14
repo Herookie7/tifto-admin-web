@@ -208,6 +208,9 @@ export const DISPATCH_TABLE_COLUMNS = () => {
   });
 
   //Handlers
+  // Note: Manual rider assignment is optional. Riders can self-assign orders through their app.
+  // Admin assignment is typically used for special cases, high-priority orders, or when orders
+  // haven't been picked up by riders after some time.
   const handleAssignRider = async (
     item: IDropdownSelectItem,
     rowData: IActiveOrders
@@ -318,6 +321,8 @@ export const DISPATCH_TABLE_COLUMNS = () => {
                 }
                 value={selectedRider}
                 placeholder={t('Select Rider')}
+                tooltip={t('Riders can self-assign orders. Manual assignment is optional.')}
+                tooltipOptions={{ position: 'top' }}
                 onChange={(e: DropdownChangeEvent) =>
                   handleAssignRider(e.value, rowData)
                 }
