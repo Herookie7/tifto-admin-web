@@ -68,8 +68,9 @@ export default function CategoryAddForm({
     refetch: refetchSubCatrgories,
   } = useQuery<ISubCategoryByParentIdResponse>(GET_SUBCATEGORIES_BY_PARENT_ID, {
     variables: {
-      parentCategoryId: category?._id,
+      parentCategoryId: category?._id || '',
     },
+    skip: !category?._id, // Skip query when creating new category (no parentCategoryId yet)
   });
    const { restaurantLayoutContextData } = useContext(RestaurantLayoutContext);
   const restaurantId = restaurantLayoutContextData?.restaurantId || '';
