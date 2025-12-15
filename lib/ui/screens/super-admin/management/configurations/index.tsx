@@ -14,16 +14,8 @@ export default function ConfigurationsScreen() {
   return (
     <div className="screen-container">
       <ConfigHeader />
-      {ISPAID_VERSION ? (
-        <ConfigMain />
-      ) : (
-        <NoData
-          title={t('Payment Required')}
-          message={t(
-            'Please complete your purchase to gain full access to the product'
-          )}
-        />
-      )}
+      {/* Always render configuration UI; bypass payment gate for this deployment */}
+      <ConfigMain />
     </div>
   );
 }
