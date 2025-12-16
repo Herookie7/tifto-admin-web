@@ -36,6 +36,12 @@ export interface IConfiguration {
   clientSecret?: string;
   sandbox?: boolean;
   secretKey?: string;
+  razorpayKeyId?: string;
+  razorpayKeySecret?: string;
+  razorpaySandbox?: boolean;
+  fast2smsApiKey?: string;
+  fast2smsEnabled?: boolean;
+  fast2smsRoute?: string;
   formEmail?: string;
   sendGridApiKey?: string;
   sendGridEnabled?: boolean;
