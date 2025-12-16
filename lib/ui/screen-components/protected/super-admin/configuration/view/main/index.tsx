@@ -2,6 +2,8 @@
 import NodeMailerAddForm from '../../add-form/nodemailer';
 import StripeAddForm from '../../add-form/stripe';
 import PayPalAddForm from '../../add-form/paypal';
+import RazorpayAddForm from '../../add-form/razorpay';
+import Fast2SMSAddForm from '../../add-form/fast2sms';
 import DeliveryRateAddForm from '../../add-form/delivery-rate';
 import GoogleApiAddForm from '../../add-form/google-api';
 import CloudinaryAddForm from '../../add-form/cloudinary';
@@ -16,8 +18,10 @@ const ConfigMain = () => {
   return (
     <div className="space-y-6 flex  flex-col  p-3">
       <NodeMailerAddForm />
+      <RazorpayAddForm />
       <StripeAddForm />
       <PayPalAddForm />
+      <Fast2SMSAddForm />
       <CurrencyAddForm />
       <DeliveryRateAddForm />
       <GoogleApiAddForm />

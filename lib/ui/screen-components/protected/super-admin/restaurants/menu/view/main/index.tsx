@@ -60,7 +60,7 @@ export default function MenuItemsMain() {
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50); // Increased default to show more products
   const [totalRecords, setTotalRecords] = useState(0);
 
   // Debounce search
@@ -98,9 +98,19 @@ export default function MenuItemsMain() {
         page: currentPage,
         limit: rowsPerPage,
       });
+      
+      console.log('Fetched products response:', {
+        total: response.total,
+        page: response.page,
+        limit: response.limit,
+        resultsCount: response.results?.length || 0,
+        products: response.results,
+      });
+      
       setProducts(response.results || []);
       setTotalRecords(response.total || 0);
     } catch (error: any) {
+      console.error('Error fetching products:', error);
       showToast({
         type: 'error',
         title: t('Error'),

@@ -32,7 +32,7 @@ const TippingAddForm = () => {
     GET_TIPPING,
     {}, // Empty variables object (required parameter)
     {
-      fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-and-network',
       errorPolicy: 'all', // Return partial data even if there are errors
       onError: (error) => {
         console.error('Error fetching tips:', error);

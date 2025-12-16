@@ -22,6 +22,18 @@ export const PayPalValidationSchema = Yup.object().shape({
   secret: Yup.boolean(),
 });
 
+export const RazorpayValidationSchema = Yup.object().shape({
+  keyId: Yup.string().required('required'),
+  keySecret: Yup.string().required('required'),
+  sandbox: Yup.boolean(),
+});
+
+export const Fast2SMSValidationSchema = Yup.object().shape({
+  apiKey: Yup.string().required('required'),
+  enabled: Yup.boolean(),
+  route: Yup.string(),
+});
+
 export const DeliverytRateValidationSchema = Yup.object().shape({
   deliveryRate: Yup.number().required('required'),
 });

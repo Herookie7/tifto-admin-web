@@ -31,6 +31,12 @@ export const useConfiguration = () => {
   const PAYPAL_KEY = configuration?.clientId;
   const PAYPAL_SECRET = configuration?.clientSecret;
   const PAYPAL_SANDBOX = configuration?.sandbox;
+  const RAZORPAY_KEY_ID = configuration?.razorpayKeyId;
+  const RAZORPAY_KEY_SECRET = configuration?.razorpayKeySecret;
+  const RAZORPAY_SANDBOX = configuration?.razorpaySandbox;
+  const FAST2SMS_API_KEY = configuration?.fast2smsApiKey;
+  const FAST2SMS_ENABLED = configuration?.fast2smsEnabled;
+  const FAST2SMS_ROUTE = configuration?.fast2smsRoute;
   const GOOGLE_MAPS_KEY = configuration?.googleApiKey;
   const LIBRARIES = 'places,drawing,geometry,visualization'.split(
     ','
@@ -100,6 +106,16 @@ export const useConfiguration = () => {
     PAYPAL_KEY,
     PAYPAL_SECRET,
     PAYPAL_SANDBOX,
+
+    // RAZORPAY
+    RAZORPAY_KEY_ID,
+    RAZORPAY_KEY_SECRET,
+    RAZORPAY_SANDBOX,
+
+    // FAST2SMS
+    FAST2SMS_API_KEY,
+    FAST2SMS_ENABLED,
+    FAST2SMS_ROUTE,
 
     // DELIVERY RATE
     DELIVERY_RATE,

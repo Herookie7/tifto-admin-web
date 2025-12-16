@@ -13,6 +13,12 @@ export const GET_CONFIGURATION = gql`
       sandbox
       publishableKey
       secretKey
+      razorpayKeyId
+      razorpayKeySecret
+      razorpaySandbox
+      fast2smsApiKey
+      fast2smsEnabled
+      fast2smsRoute
       currency
       currencySymbol
       deliveryRate

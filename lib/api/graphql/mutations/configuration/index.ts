@@ -155,6 +155,32 @@ export const SAVE_STRIPE_CONFIGURATION = gql`
   }
 `;
 
+export const SAVE_RAZORPAY_CONFIGURATION = gql`
+  mutation SAVE_RAZORPAY_CONFIGURATION(
+    $configurationInput: RazorpayConfigurationInput!
+  ) {
+    saveRazorpayConfiguration(configurationInput: $configurationInput) {
+      _id
+      razorpayKeyId
+      razorpayKeySecret
+      razorpaySandbox
+    }
+  }
+`;
+
+export const SAVE_FAST2SMS_CONFIGURATION = gql`
+  mutation SAVE_FAST2SMS_CONFIGURATION(
+    $configurationInput: Fast2SMSConfigurationInput!
+  ) {
+    saveFast2SMSConfiguration(configurationInput: $configurationInput) {
+      _id
+      fast2smsApiKey
+      fast2smsEnabled
+      fast2smsRoute
+    }
+  }
+`;
+
 export const SAVE_VERIFICATION_CONFIGURATION = gql`
   mutation SAVE_VERIFICATIONS_TOGGLE(
     $configurationInput: VerificationConfigurationInput!

@@ -26,6 +26,18 @@ export interface IPaypalForm {
   sandbox: boolean | undefined;
 }
 
+export interface IRazorpayForm {
+  keyId: string | undefined;
+  keySecret: string | undefined;
+  sandbox: boolean | undefined;
+}
+
+export interface IFast2SMSForm {
+  apiKey: string | undefined;
+  enabled: boolean | undefined;
+  route: string | undefined;
+}
+
 export interface IDeliveryRateForm {
   deliveryRate: number | null;
   costType: string;
