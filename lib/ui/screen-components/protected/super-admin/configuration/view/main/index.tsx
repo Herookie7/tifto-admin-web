@@ -17,18 +17,16 @@ import AppVersionAddForm from '../../add-form/app-versions';
 const ConfigMain = () => {
   return (
     <div className="space-y-6 flex  flex-col  p-3">
-      <NodeMailerAddForm />
       <RazorpayAddForm />
-      <StripeAddForm />
-      <PayPalAddForm />
       <Fast2SMSAddForm />
-      <CurrencyAddForm />
       <DeliveryRateAddForm />
+      <CurrencyAddForm />
+      <AppConfigAddForm />
       <GoogleApiAddForm />
-      <CloudinaryAddForm />
       <GoogleClientAddForm />
       <FirebaseAdminAddForm />
-      <AppConfigAddForm />
+      <CloudinaryAddForm />
+      <NodeMailerAddForm />
       <VerificationAddForm />
       <AppVersionAddForm />
     </div>
