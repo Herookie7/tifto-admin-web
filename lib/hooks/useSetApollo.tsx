@@ -20,6 +20,22 @@ import { getCachedAuthToken, setCachedAuthToken } from '../utils/auth-token';
 export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   const { SERVER_URL, WS_SERVER_URL } = useConfiguration();
 
+  // Initialize cached token from localStorage if available
+  // This ensures WebSocket connection has the token immediately
+  if (typeof window !== 'undefined') {
+    try {
+      const data = localStorage.getItem(`user-${APP_NAME}`);
+      if (data) {
+        const token = JSON.parse(data).token;
+        if (token) {
+          setCachedAuthToken(token);
+        }
+      }
+    } catch (error) {
+      // Ignore error
+    }
+  }
+
   const cache = new InMemoryCache();
 
   // Ensure GraphQL URL is correctly formatted (no double slashes)
@@ -30,13 +46,13 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   if (!wsGraphqlUrl.endsWith('/graphql')) {
     wsGraphqlUrl = `${wsGraphqlUrl}/graphql`;
   }
-  
+
   // Debug: Log the URLs being used (remove in production if needed)
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
     console.log('🔗 GraphQL URL:', graphqlUrl);
     console.log('🔗 WebSocket URL:', wsGraphqlUrl);
   }
-  
+
   const httpLink = createHttpLink({
     uri: graphqlUrl,
     fetchOptions: {
@@ -133,17 +149,21 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   });
 
   const getAuthorizationToken = async (): Promise<string | null> => {
+    // 1. Try to get the custom token from the user object in localStorage (the token returned by the backend login)
     try {
-      const currentUser = firebaseAuth.currentUser;
-      if (currentUser) {
-        const idToken = await currentUser.getIdToken();
-        setCachedAuthToken(idToken);
-        return idToken;
+      const data = localStorage.getItem(`user-${APP_NAME}`);
+      if (data) {
+        const token = JSON.parse(data).token;
+        if (token) {
+          setCachedAuthToken(token);
+          return token;
+        }
       }
     } catch (error) {
-      console.error('Unable to retrieve Firebase ID token', error);
+      console.error('Unable to read stored custom token', error);
     }
 
+    // 2. Try to get the stored Firebase token from localStorage
     try {
       const storedFirebaseToken = localStorage.getItem(`firebase-${APP_NAME}`);
       if (storedFirebaseToken) {
@@ -154,17 +174,16 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
       console.error('Unable to read stored Firebase token', error);
     }
 
+    // 3. Last resort: Try to get the current Firebase ID token (may not be supported by backend)
     try {
-      const data = localStorage.getItem(`user-${APP_NAME}`);
-      if (data) {
-        const legacyToken = JSON.parse(data).token;
-        if (legacyToken) {
-          setCachedAuthToken(legacyToken);
-          return legacyToken;
-        }
+      const currentUser = firebaseAuth.currentUser;
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken();
+        setCachedAuthToken(idToken);
+        return idToken;
       }
     } catch (error) {
-      console.error('Unable to read stored legacy token', error);
+      console.error('Unable to retrieve Firebase ID token', error);
     }
 
     setCachedAuthToken(null);
