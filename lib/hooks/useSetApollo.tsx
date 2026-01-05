@@ -197,11 +197,12 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
         let handle: Subscription | undefined;
         Promise.resolve(getAuthorizationToken())
           .then((token) => {
-            operation.setContext({
+            operation.setContext(({ headers = {} }) => ({
               headers: {
+                ...headers,
                 authorization: token ? `Bearer ${token}` : '',
               },
-            });
+            }));
             handle = forward(operation).subscribe({
               next: observer.next.bind(observer),
               error: observer.error.bind(observer),
