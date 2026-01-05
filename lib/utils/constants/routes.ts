@@ -51,6 +51,14 @@ export const ROUTES = [
     text: 'Staff',
     route: '/general/staff',
   },
+  {
+    text: 'Franchise',
+    route: '/general/franchise',
+  },
+  {
+    text: 'Reports',
+    route: '/reports',
+  },
 ];
 
 export const DEFAULT_ROUTES = {
