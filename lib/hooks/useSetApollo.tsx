@@ -16,12 +16,22 @@ import { Subscription } from 'zen-observable-ts';
 import { APP_NAME } from '../utils/constants';
 import { firebaseAuth } from '../services';
 import { getCachedAuthToken, setCachedAuthToken } from '../utils/auth-token';
+import { useMemo } from 'react';
 
 export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
   const { SERVER_URL, WS_SERVER_URL } = useConfiguration();
 
-  // Initialize cached token from localStorage if available
-  // This ensures WebSocket connection has the token immediately
+  // 1. Memoize URLs and shared Logic
+  const urls = useMemo(() => {
+    const graphqlUrl = `${SERVER_URL.replace(/\/$/, '')}/graphql`;
+    let wsGraphqlUrl = WS_SERVER_URL.replace(/\/$/, '');
+    if (!wsGraphqlUrl.endsWith('/graphql')) {
+      wsGraphqlUrl = `${wsGraphqlUrl}/graphql`;
+    }
+    return { graphqlUrl, wsGraphqlUrl };
+  }, [SERVER_URL, WS_SERVER_URL]);
+
+  // 2. Initialize token cache early
   if (typeof window !== 'undefined') {
     try {
       const data = localStorage.getItem(`user-${APP_NAME}`);
@@ -32,124 +42,15 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
         }
       }
     } catch (error) {
-      // Ignore error
+      // Ignore
     }
   }
 
-  const cache = new InMemoryCache();
-
-  // Ensure GraphQL URL is correctly formatted (no double slashes)
-  const graphqlUrl = `${SERVER_URL.replace(/\/$/, '')}/graphql`;
-  // Ensure WebSocket URL is correctly formatted
-  // If WS_SERVER_URL already ends with /graphql, don't append it again
-  let wsGraphqlUrl = WS_SERVER_URL.replace(/\/$/, '');
-  if (!wsGraphqlUrl.endsWith('/graphql')) {
-    wsGraphqlUrl = `${wsGraphqlUrl}/graphql`;
-  }
-
-  // Debug: Log the URLs being used (remove in production if needed)
-  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    console.log('🔗 GraphQL URL:', graphqlUrl);
-    console.log('🔗 WebSocket URL:', wsGraphqlUrl);
-  }
-
-  const httpLink = createHttpLink({
-    uri: graphqlUrl,
-    fetchOptions: {
-      mode: 'cors',
-      credentials: 'omit',
-    },
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  // WebSocketLink with error handling and retry logic
-  const subscriptionClient = new SubscriptionClient(wsGraphqlUrl, {
-    reconnect: true,
-    timeout: 30000,
-    lazy: true,
-    reconnectionAttempts: 5,
-    connectionCallback: (error) => {
-      if (error) {
-        console.error('WebSocket connection failed:', error);
-        // The client will automatically retry with exponential backoff
-      }
-    },
-    connectionParams: () => {
-      const token = getCachedAuthToken();
-      if (token) {
-        return {
-          Authorization: `Bearer ${token}`,
-        };
-      }
-      return {};
-    },
-  });
-
-  // Handle WebSocket connection events
-  subscriptionClient.on('connected', () => {
-    if (typeof window !== 'undefined') {
-      console.log('✅ WebSocket connected to:', wsGraphqlUrl);
-    }
-  });
-
-  subscriptionClient.on('disconnected', () => {
-    if (typeof window !== 'undefined') {
-      console.warn('⚠️ WebSocket disconnected. Will attempt to reconnect...');
-    }
-  });
-
-  subscriptionClient.on('reconnected', () => {
-    if (typeof window !== 'undefined') {
-      console.log('✅ WebSocket reconnected successfully');
-    }
-  });
-
-  subscriptionClient.on('error', (error) => {
-    if (typeof window !== 'undefined') {
-      // Only log non-critical errors (connection errors are handled by reconnect logic)
-      if (error.message && !error.message.includes('connection')) {
-        console.error('WebSocket error:', error);
-      }
-    }
-  });
-
-  const wsLink = new WebSocketLink(subscriptionClient);
-
-  // Error Handling Link using ApolloLink's onError (for network errors)
-  const errorLink = onError(({ networkError, graphQLErrors, operation }) => {
-    if (networkError) {
-      // Handle CORS errors more gracefully
-      if ('statusCode' in networkError || (networkError.message && networkError.message.includes('CORS'))) {
-        console.error(
-          'CORS or network error detected.',
-          '\nRequest URL:', operation.getContext().uri || graphqlUrl,
-          '\nThis may be a backend CORS configuration issue.',
-          '\nPlease ensure the backend allows requests from this origin.'
-        );
-      } else if (networkError.message && networkError.message.includes('Failed to fetch')) {
-        console.error(
-          'Network request failed. Possible causes:',
-          '\n- Backend server is down or unreachable',
-          '\n- CORS configuration issue',
-          '\n- Network connectivity problem',
-          '\nRequest URL:', operation.getContext().uri || graphqlUrl
-        );
-      } else {
-        console.error('Network Error:', networkError);
-      }
-    }
-
-    if (graphQLErrors) {
-      graphQLErrors.forEach((error) => {
-        console.error('GraphQL Error:', error.message);
-      });
-    }
-  });
-
+  // 3. Define the token utility (inside hook to access APP_NAME if needed, though it's a constant)
   const getAuthorizationToken = async (): Promise<string | null> => {
-    // 1. Try to get the custom token from the user object in localStorage (the token returned by the backend login)
+    if (typeof window === 'undefined') return null;
+
+    // A. Custom Token (Backend Login)
     try {
       const data = localStorage.getItem(`user-${APP_NAME}`);
       if (data) {
@@ -160,10 +61,10 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
         }
       }
     } catch (error) {
-      console.error('Unable to read stored custom token', error);
+      console.error('[Apollo] Stored token error:', error);
     }
 
-    // 2. Try to get the stored Firebase token from localStorage
+    // B. Firebase Stored token
     try {
       const storedFirebaseToken = localStorage.getItem(`firebase-${APP_NAME}`);
       if (storedFirebaseToken) {
@@ -171,10 +72,10 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
         return storedFirebaseToken;
       }
     } catch (error) {
-      console.error('Unable to read stored Firebase token', error);
+      console.error('[Apollo] Firebase stored token error:', error);
     }
 
-    // 3. Last resort: Try to get the current Firebase ID token (may not be supported by backend)
+    // C. Live Firebase Token
     try {
       const currentUser = firebaseAuth.currentUser;
       if (currentUser) {
@@ -183,60 +84,96 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
         return idToken;
       }
     } catch (error) {
-      console.error('Unable to retrieve Firebase ID token', error);
+      console.error('[Apollo] Firebase live token error:', error);
     }
 
-    setCachedAuthToken(null);
     return null;
   };
 
-  // Request Link
-  const authLink = new ApolloLink(
-    (operation, forward) =>
-      new Observable((observer) => {
-        let handle: Subscription | undefined;
-        Promise.resolve(getAuthorizationToken())
-          .then((token) => {
-            operation.setContext(({ headers = {} }) => ({
-              headers: {
-                ...headers,
-                authorization: token ? `Bearer ${token}` : '',
-              },
-            }));
-            handle = forward(operation).subscribe({
-              next: observer.next.bind(observer),
-              error: observer.error.bind(observer),
-              complete: observer.complete.bind(observer),
-            });
-          })
-          .catch(observer.error.bind(observer));
+  // 4. Memoize the Apollo Client
+  const client = useMemo(() => {
+    const cache = new InMemoryCache();
 
-        return () => {
-          if (handle) handle.unsubscribe();
+    const httpLink = createHttpLink({
+      uri: urls.graphqlUrl,
+      fetchOptions: {
+        mode: 'cors',
+        credentials: 'omit',
+      },
+    });
+
+    const subscriptionClient = new SubscriptionClient(urls.wsGraphqlUrl, {
+      reconnect: true,
+      timeout: 30000,
+      lazy: true,
+      connectionParams: async () => {
+        const token = await getAuthorizationToken();
+        return {
+          authorization: token ? `Bearer ${token}` : '',
+          Authorization: token ? `Bearer ${token}` : '', // Support both cases
         };
-      })
-  );
+      },
+    });
 
-  // Terminating Link for split between HTTP and WebSocket
-  // Subscriptions use WebSocket, queries and mutations use HTTP
-  // The lazy connection and reconnection logic in SubscriptionClient handles failures gracefully
-  const terminatingLink = split(
-    ({ query }) => {
-      const definition = getMainDefinition(query);
-      return (
-        definition.kind === 'OperationDefinition' &&
-        definition.operation === 'subscription'
-      );
-    },
-    wsLink,
-    ApolloLink.from([errorLink, authLink, httpLink])
-  );
+    const wsLink = new WebSocketLink(subscriptionClient);
 
-  const client = new ApolloClient({
-    link: terminatingLink,
-    cache,
-    connectToDevTools: true,
-  });
+    const errorLink = onError(({ networkError, graphQLErrors, operation }) => {
+      if (graphQLErrors) {
+        graphQLErrors.forEach(({ message, locations, path }) =>
+          console.error(
+            `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+          )
+        );
+      }
+      if (networkError) {
+        console.error(`[Network error]: ${networkError}`, networkError);
+      }
+    });
+
+    const authLink = new ApolloLink(
+      (operation, forward) =>
+        new Observable((observer) => {
+          let handle: Subscription | undefined;
+          getAuthorizationToken()
+            .then((token) => {
+              operation.setContext(({ headers = {} }) => ({
+                headers: {
+                  ...headers,
+                  authorization: token ? `Bearer ${token}` : '',
+                },
+              }));
+              handle = forward(operation).subscribe({
+                next: observer.next.bind(observer),
+                error: observer.error.bind(observer),
+                complete: observer.complete.bind(observer),
+              });
+            })
+            .catch(observer.error.bind(observer));
+
+          return () => {
+            if (handle) handle.unsubscribe();
+          };
+        })
+    );
+
+    const splitLink = split(
+      ({ query }) => {
+        const definition = getMainDefinition(query);
+        return (
+          definition.kind === 'OperationDefinition' &&
+          definition.operation === 'subscription'
+        );
+      },
+      wsLink,
+      ApolloLink.from([authLink, httpLink])
+    );
+
+    return new ApolloClient({
+      link: ApolloLink.from([errorLink, splitLink]),
+      cache,
+      connectToDevTools: true,
+    });
+  }, [urls.graphqlUrl, urls.wsGraphqlUrl]);
 
   return client;
 };
