@@ -22,6 +22,7 @@ export const GET_CONFIGURATION = gql`
       currency
       currencySymbol
       deliveryRate
+      freeDeliveryAmount
       skipWhatsAppOTP
       formEmail
       sendGridApiKey

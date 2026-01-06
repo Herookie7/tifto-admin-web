@@ -36,6 +36,7 @@ export const Fast2SMSValidationSchema = Yup.object().shape({
 
 export const DeliverytRateValidationSchema = Yup.object().shape({
   deliveryRate: Yup.number().required('required'),
+  freeDeliveryAmount: Yup.number().min(0, 'Must be positive'),
 });
 
 export const GoogleApiValidationSchema = Yup.object().shape({

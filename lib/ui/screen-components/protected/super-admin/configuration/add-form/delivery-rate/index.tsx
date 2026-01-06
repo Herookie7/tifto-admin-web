@@ -27,11 +27,12 @@ import CustomNumberField from '@/lib/ui/useable-components/number-input-field';
 
 const DeliveryRateAddForm = () => {
   // Hooks
-  const { DELIVERY_RATE, COST_TYPE } = useConfiguration();
+  const { DELIVERY_RATE, FREE_DELIVERY_AMOUNT, COST_TYPE } = useConfiguration();
   const { showToast } = useToast();
 
   const initialValues: IDeliveryRateForm = {
     deliveryRate: DELIVERY_RATE ?? null,
+    freeDeliveryAmount: FREE_DELIVERY_AMOUNT ?? null,
     costType: COST_TYPE,
   };
 
@@ -47,6 +48,7 @@ const DeliveryRateAddForm = () => {
       variables: {
         configurationInput: {
           deliveryRate: values.deliveryRate,
+          freeDeliveryAmount: values.freeDeliveryAmount,
           costType: values.costType,
         },
       },
@@ -106,6 +108,23 @@ const DeliveryRateAddForm = () => {
                           : '',
                     }}
                   />
+                  <div className="mt-4">
+                    <CustomNumberField
+                      min={0}
+                      placeholder="Free Delivery Amount"
+                      name="freeDeliveryAmount"
+                      showLabel={true}
+                      value={values.freeDeliveryAmount}
+                      useGrouping={false}
+                      onChange={setFieldValue}
+                      style={{
+                        borderColor:
+                          errors.freeDeliveryAmount && touched.freeDeliveryAmount
+                            ? 'red'
+                            : '',
+                      }}
+                    />
+                  </div>
                 </div>
               </ConfigCard>
             </Form>

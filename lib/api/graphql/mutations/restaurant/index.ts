@@ -29,6 +29,7 @@ export const CREATE_RESTAURANT = gql`
         coordinates
       }
       cuisines
+      isPinned
     }
   }
 `;
@@ -115,6 +116,7 @@ export const EDIT_RESTAURANT = gql`
         }
       }
       shopType
+      isPinned
     }
   }
 `;
@@ -201,6 +203,25 @@ export const UPDATE_RESTAURANT_BUSSINESS_DETAILS = gql`
       data {
         _id
       }
+    }
+  }
+`;
+
+export const TOGGLE_RESTAURANT_PIN = gql`
+  mutation ToggleRestaurantPin(
+    $restaurantId: String!
+    $isPinned: Boolean!
+    $pinDurationDays: Int
+  ) {
+    toggleRestaurantPin(
+      restaurantId: $restaurantId
+      isPinned: $isPinned
+      pinDurationDays: $pinDurationDays
+    ) {
+      _id
+      name
+      isPinned
+      pinExpiry
     }
   }
 `;

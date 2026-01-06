@@ -40,6 +40,7 @@ export interface IFast2SMSForm {
 
 export interface IDeliveryRateForm {
   deliveryRate: number | null;
+  freeDeliveryAmount: number | null;
   costType: string;
 }
 

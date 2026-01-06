@@ -125,6 +125,7 @@ export const SAVE_DELIVERY_RATE_CONFIGURATION = gql`
     saveDeliveryRateConfiguration(configurationInput: $configurationInput) {
       _id
       deliveryRate
+      freeDeliveryAmount
       costType
     }
   }

@@ -21,7 +21,7 @@ export interface IRestaurantForm {
   name: string;
   username: string;
   password: string;
-  phoneNumber?:string;
+  phoneNumber?: string;
   confirmPassword: string;
   address: string;
   deliveryTime: number;
@@ -31,6 +31,7 @@ export interface IRestaurantForm {
   cuisines: IDropdownSelectItem[];
   image: string;
   logo: string;
+  isPinned?: boolean;
 }
 
 

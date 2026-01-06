@@ -116,6 +116,7 @@ export default function RestaurantDetailScreen() {
           shopType: restaurant.shopType,
           cuisines: restaurant.cuisines,
           tags: restaurant.tags,
+          isPinned: restaurant?.isPinned,
         } as any,
         vendor: {
           _id: (typeof restaurant.owner === 'object' && restaurant.owner?._id) || restaurant.owner || null,

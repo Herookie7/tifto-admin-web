@@ -23,6 +23,18 @@ const GET_DASHBOARD_STATS = gql`
   }
 `;
 
+const GET_TRANSACTION_SUMMARY = gql`
+  query GetTransactionSummary {
+    getTransactionSummary {
+      totalReferralPayouts
+      totalCoinConversions
+      totalWalletTopUps
+      referralCount
+      coinConversionCount
+    }
+  }
+`;
+
 interface DashboardStats {
     getDashboardUsers?: {
         usersCount: number[];
@@ -42,8 +54,19 @@ interface DashboardStats {
     };
 }
 
+interface TransactionSummary {
+    getTransactionSummary?: {
+        totalReferralPayouts: number;
+        totalCoinConversions: number;
+        totalWalletTopUps: number;
+        referralCount: number;
+        coinConversionCount: number;
+    };
+}
+
 export default function ReportsScreen() {
     const { loading, data } = useQuery<DashboardStats>(GET_DASHBOARD_STATS);
+    const { loading: loadingTransactions, data: transactionData } = useQuery<TransactionSummary>(GET_TRANSACTION_SUMMARY);
 
     const stats = data || {};
     const ordersData = stats.getDashboardOrdersByType || { delivery: 0, pickup: 0, total: 0 };
@@ -87,6 +110,55 @@ export default function ReportsScreen() {
                     <p className="text-3xl font-bold text-purple-600">
                         {loading ? '...' : (stats.getDashboardUsers?.restaurantsCount?.[0] || 0).toLocaleString()}
                     </p>
+                </div>
+            </div>
+
+            {/* Wallet Transaction Summary */}
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Wallet & Rewards Revenue
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+                        <div className="text-sm opacity-90 mb-1">Referral Payouts</div>
+                        <div className="text-2xl font-bold">
+                            {loadingTransactions ? '...' : `₹${(transactionData?.getTransactionSummary?.totalReferralPayouts || 0).toLocaleString()}`}
+                        </div>
+                        <div className="text-xs opacity-75 mt-1">
+                            {transactionData?.getTransactionSummary?.referralCount || 0} referrals
+                        </div>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+                        <div className="text-sm opacity-90 mb-1">Coin Conversions</div>
+                        <div className="text-2xl font-bold">
+                            {loadingTransactions ? '...' : `₹${(transactionData?.getTransactionSummary?.totalCoinConversions || 0).toLocaleString()}`}
+                        </div>
+                        <div className="text-xs opacity-75 mt-1">
+                            {transactionData?.getTransactionSummary?.coinConversionCount || 0} conversions
+                        </div>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+                        <div className="text-sm opacity-90 mb-1">Wallet Top-Ups</div>
+                        <div className="text-2xl font-bold">
+                            {loadingTransactions ? '...' : `₹${(transactionData?.getTransactionSummary?.totalWalletTopUps || 0).toLocaleString()}`}
+                        </div>
+                        <div className="text-xs opacity-75 mt-1">Customer deposits</div>
+                    </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-white/20">
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm opacity-90">Total Platform Revenue</span>
+                        <span className="text-xl font-bold">
+                            ₹{loadingTransactions ? '...' : (
+                                (transactionData?.getTransactionSummary?.totalReferralPayouts || 0) +
+                                (transactionData?.getTransactionSummary?.totalCoinConversions || 0) +
+                                (transactionData?.getTransactionSummary?.totalWalletTopUps || 0)
+                            ).toLocaleString()}
+                        </span>
+                    </div>
                 </div>
             </div>
 

@@ -35,6 +35,7 @@ import {
   GET_RESTAURANTS_PAGINATED,
   GET_CLONED_RESTAURANTS_PAGINATED,
   HARD_DELETE_RESTAURANT,
+  TOGGLE_RESTAURANT_PIN,
 } from '@/lib/api/graphql';
 
 // Method
@@ -53,7 +54,7 @@ export default function RestaurantsMain() {
   // Context
   const { showToast } = useContext(ToastContext);
   const { currentTab } = useContext(RestaurantsContext);
-  
+
   // Hooks
   const router = useRouter();
 
@@ -65,7 +66,7 @@ export default function RestaurantsMain() {
   const [selectedProducts, setSelectedProducts] = useState<IRestaurantResponse[]>([]);
   const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [selectedActions, setSelectedActions] = useState<string[]>([]);
-  
+
   // Debounce search to avoid too many API calls
   const debouncedSearchTerm = useDebounce(globalFilterValue, 500);
 
@@ -141,6 +142,35 @@ export default function RestaurantsMain() {
     }
   );
 
+  const [togglePin, { loading: isTogglingPin }] = useMutation(
+    TOGGLE_RESTAURANT_PIN,
+    {
+      onCompleted: (data) => {
+        const restaurant = data.toggleRestaurantPin;
+        showToast({
+          type: 'success',
+          title: t('Pin Status Updated'),
+          message: restaurant.isPinned
+            ? t('Store has been pinned to top')
+            : t('Store has been unpinned'),
+          duration: 2000,
+        });
+        refetch();
+      },
+      onError: ({ networkError, graphQLErrors }: ApolloError) => {
+        showToast({
+          type: 'error',
+          title: t('Pin Toggle Failed'),
+          message:
+            graphQLErrors[0]?.message ??
+            networkError?.message ??
+            t('Failed to update pin status'),
+          duration: 2500,
+        });
+      },
+    }
+  );
+
   const handleDelete = async (id: string) => {
     try {
       await hardDeleteRestaurant({ variables: { id: id } });
@@ -199,6 +229,21 @@ export default function RestaurantsMain() {
       },
     },
     {
+      label: (data?: IRestaurantResponse) =>
+        data?.isPinned ? t('Unpin from Top') : t('Pin to Top'),
+      command: (data?: IRestaurantResponse) => {
+        if (data) {
+          togglePin({
+            variables: {
+              restaurantId: data._id,
+              isPinned: !data.isPinned,
+              pinDurationDays: data.isPinned ? undefined : 30, // 30 days for new pins
+            },
+          });
+        }
+      },
+    },
+    {
       label: t('Delete'),
       command: (data?: IRestaurantResponse) => {
         if (data) {
@@ -209,21 +254,21 @@ export default function RestaurantsMain() {
   ];
 
   // Get pagination data
-  const restaurantData = currentTab === 'Actual' 
-  ? data?.restaurantsPaginated 
-  : data?.getClonedRestaurantsPaginated;
+  const restaurantData = currentTab === 'Actual'
+    ? data?.restaurantsPaginated
+    : data?.getClonedRestaurantsPaginated;
 
   const restaurants = restaurantData?.data || [];
   const totalRecords = restaurantData?.total || 0;
 
   useEffect(() => {
-    console.log("🚀 Store Screen Rendered", { 
-      currentTab, 
-      data, 
-      loading, 
+    console.log("🚀 Store Screen Rendered", {
+      currentTab,
+      data,
+      loading,
       error: error?.message,
       restaurantsCount: restaurants.length,
-      totalRecords 
+      totalRecords
     });
   }, [currentTab, data, loading, error, restaurants.length, totalRecords]);
 

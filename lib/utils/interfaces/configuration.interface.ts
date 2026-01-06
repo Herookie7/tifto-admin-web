@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { IGlobalProps } from './global.interface';
 
-export interface IConfigurationContextProps extends IGlobalProps {}
+export interface IConfigurationContextProps extends IGlobalProps { }
 
 export interface IConfiguration {
   _id: string;
@@ -17,6 +17,7 @@ export interface IConfiguration {
   currency?: string;
   currencySymbol?: string;
   deliveryRate: number;
+  freeDeliveryAmount?: number;
   googleMapLibraries: string;
   firebaseKey?: string;
   appId?: string;

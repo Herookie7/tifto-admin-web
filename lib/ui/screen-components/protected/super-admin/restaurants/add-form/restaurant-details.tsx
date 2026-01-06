@@ -30,6 +30,8 @@ import {
   SHOP_TYPE,
 } from '@/lib/utils/constants';
 
+import CustomInputSwitch from '@/lib/ui/useable-components/custom-input-switch';
+
 // Interface
 import { IRestaurantForm } from '@/lib/utils/interfaces';
 
@@ -73,6 +75,7 @@ const initialValues: IRestaurantForm = {
   image:
     'https://t4.ftcdn.net/jpg/04/76/57/27/240_F_476572792_zMwqHpmGal1fzh0tDJ3onkLo88IjgNbL.jpg',
   logo: 'https://res.cloudinary.com/dc6xw0lzg/image/upload/v1735894342/dvi5fjbsgdlrzwip0whg.jpg',
+  isPinned: false,
 };
 
 export default function RestaurantDetailsForm({
@@ -83,7 +86,7 @@ export default function RestaurantDetailsForm({
 
   // Props
   const { onStepChange, order } = stepperProps ?? {
-    onStepChange: () => {},
+    onStepChange: () => { },
     type: '',
     order: -1,
   };
@@ -153,9 +156,9 @@ export default function RestaurantDetailsForm({
         return;
       }
 
-       // check if values.name is present in restaurantData and show error toast
-       const existingRestaurant = restaurantData?.restaurants.find(
-        (restaurant:IRestaurantForm) =>
+      // check if values.name is present in restaurantData and show error toast
+      const existingRestaurant = restaurantData?.restaurants.find(
+        (restaurant: IRestaurantForm) =>
           restaurant.name.toLowerCase() === data.name.toLowerCase()
       );
       console.log('existingRestaurant ==> ', existingRestaurant);
@@ -187,6 +190,7 @@ export default function RestaurantDetailsForm({
             cuisines: data.cuisines.map(
               (cuisin: IDropdownSelectItem) => cuisin.code
             ),
+            isPinned: data.isPinned,
           },
         },
       });
@@ -263,6 +267,13 @@ export default function RestaurantDetailsForm({
                 return (
                   <Form onSubmit={handleSubmit}>
                     <div className="mb-3 space-y-3">
+                      <div className="flex items-center justify-end">
+                        <CustomInputSwitch
+                          label={t('Pinned')}
+                          isActive={values.isPinned ?? false}
+                          onChange={(e) => setFieldValue('isPinned', e.target.checked)}
+                        />
+                      </div>
                       <div>
                         <CustomTextField
                           type="text"

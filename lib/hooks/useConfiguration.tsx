@@ -119,6 +119,7 @@ export const useConfiguration = () => {
 
     // DELIVERY RATE
     DELIVERY_RATE,
+    FREE_DELIVERY_AMOUNT: configuration?.freeDeliveryAmount,
     COST_TYPE,
     SKIP_WHATSAPP_OTP,
 

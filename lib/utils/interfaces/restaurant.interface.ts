@@ -74,6 +74,8 @@ export interface IRestaurantResponse {
     __typename: string;
   };
   shopType: string;
+  isPinned?: boolean;
+  pinExpiry?: string;
   __typename: string;
 }
 
