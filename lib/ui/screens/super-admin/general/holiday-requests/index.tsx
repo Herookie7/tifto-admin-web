@@ -64,7 +64,7 @@ export default function HolidayRequestsScreen() {
     };
 
     const statusBodyTemplate = (rowData: any) => {
-        let severity = null;
+        let severity: "success" | "info" | "warning" | "danger" | null | undefined = null;
         switch (rowData.status) {
             case 'APPROVED': severity = 'success'; break;
             case 'REJECTED': severity = 'danger'; break;
