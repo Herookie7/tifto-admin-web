@@ -33,9 +33,22 @@ const center = {
     lng: 77.2090
 };
 
+interface Rider {
+    _id: string;
+    name: string;
+    phone: string;
+    riderProfile: {
+        available: boolean;
+        lastSeenAt: string;
+        location: {
+            coordinates: [number, number];
+        };
+    };
+}
+
 export default function LiveTrackingPage() {
-    const { configuration } = useConfiguration(); // Fetch Google Maps Key
-    const googleMapsApiKey = configuration?.googleMapsKey || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ''; // Fallback
+    const { GOOGLE_MAPS_KEY } = useConfiguration(); // Fetch Google Maps Key
+    const googleMapsApiKey = GOOGLE_MAPS_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ''; // Fallback
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -47,14 +60,14 @@ export default function LiveTrackingPage() {
         fetchPolicy: 'network-only'
     });
 
-    const [selectedRider, setSelectedRider] = useState(null);
+    const [selectedRider, setSelectedRider] = useState<Rider | null>(null);
 
     // If config not ready, waiting state
     if (!googleMapsApiKey) return <div>Loading Configuration...</div>;
 
     if (!isLoaded) return <div className="flex justify-center items-center h-screen"><ProgressSpinner /></div>;
 
-    const riders = data?.getActiveRiders || [];
+    const riders: Rider[] = data?.getActiveRiders || [];
 
     return (
         <div className="p-4">
@@ -68,7 +81,7 @@ export default function LiveTrackingPage() {
                     } : center}
                     zoom={12}
                 >
-                    {riders.map(rider => (
+                    {riders.map((rider) => (
                         rider.riderProfile?.location?.coordinates && (
                             <Marker
                                 key={rider._id}
@@ -107,7 +120,7 @@ export default function LiveTrackingPage() {
             <div className="mt-4">
                 <h2 className="text-xl font-semibold">Active Riders List</h2>
                 <ul className="mt-2 space-y-2">
-                    {riders.map(rider => (
+                    {riders.map((rider) => (
                         <li key={rider._id} className="border p-2 rounded flex justify-between">
                             <span>{rider.name}</span>
                             <span className="text-sm text-gray-500">
