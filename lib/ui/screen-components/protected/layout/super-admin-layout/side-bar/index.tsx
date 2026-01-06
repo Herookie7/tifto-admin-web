@@ -29,6 +29,7 @@ import useCheckAllowedRoutes from '@/lib/hooks/useCheckAllowedRoutes';
 import SidebarItem from './side-bar-item';
 import { useTranslations } from 'next-intl';
 import { faHeadset } from '@fortawesome/free-solid-svg-icons/faHeadset';
+import { useUserContext } from '@/lib/hooks/useUser';
 
 function SuperAdminSidebar({ children }: IGlobalComponentProps) {
   // Contexts
@@ -58,6 +59,8 @@ export default function MakeSidebar() {
   // Contexts
   const { isSuperAdminSidebarVisible } =
     useContext<LayoutContextProps>(LayoutContext);
+  const { user } = useUserContext();
+  const isFranchiseAdmin = (user as any)?.userType === 'FRANCHISE_ADMIN' || (user as any)?.role === 'franchise-admin';
 
   const navBarItems: ISidebarMenuItem[] = [
     // {
@@ -114,6 +117,12 @@ export default function MakeSidebar() {
           route: '/general/staff',
           isParent: false,
         },
+        ...(isFranchiseAdmin ? [] : [{
+          text: 'Franchise',
+          label: t('Franchise'),
+          route: '/general/franchise',
+          isParent: false,
+        }]),
       ]),
       shouldShow: function () {
         return this.subMenu ? this.subMenu.length > 0 : false;
@@ -126,12 +135,12 @@ export default function MakeSidebar() {
       isParent: true,
       icon: faSliders,
       subMenu: useCheckAllowedRoutes([
-        {
+        ...(!isFranchiseAdmin ? [{
           text: 'Configuration',
           label: t('Configuration'),
           route: '/management/configurations',
           isParent: false,
-        },
+        }] : []),
         {
           text: 'Orders',
           label: t('Orders'),
@@ -144,37 +153,36 @@ export default function MakeSidebar() {
           route: '/management/coupons',
           isParent: false,
         },
-        {
+        ...(!isFranchiseAdmin ? [{
           text: 'Cuisine',
           label: t('Cuisine'),
           route: '/management/cuisines',
           isParent: false,
-        },
-        {
+        }] : []),
+        ...(!isFranchiseAdmin ? [{
           text: 'Shop Type',
           label: t('ShopType'),
           route: '/management/shop-types',
           isParent: false,
-        },
-        {
+        }] : []),
+        ...(!isFranchiseAdmin ? [{
           text: 'Banners',
           label: t('Banners'),
           route: '/management/banners',
           isParent: false,
-        },
-        {
+        }] : []),
+        ...(!isFranchiseAdmin ? [{
           text: 'Tipping',
           label: t('Tipping'),
           route: '/management/tippings',
           isParent: false,
-        },
-        {
+        }] : []),
+        ...(!isFranchiseAdmin ? [{
           text: 'Commission Rate',
           label: t('Commission Rate'),
           route: '/management/commission-rates',
           isParent: false,
-        },
-
+        }] : []),
         {
           text: 'Notification',
           label: t('Notification'),
