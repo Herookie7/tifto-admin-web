@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 import { useQuery, gql } from '@apollo/client';
 import { useConfiguration } from '@/lib/hooks/useConfiguration'; // Assumption: Helper for config
-import Spinner from '@/lib/ui/spinner'; // Assumption: UI Component
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 const GET_ACTIVE_RIDERS = gql`
   query GetActiveRiders {
@@ -52,7 +52,7 @@ export default function LiveTrackingPage() {
     // If config not ready, waiting state
     if (!googleMapsApiKey) return <div>Loading Configuration...</div>;
 
-    if (!isLoaded) return <Spinner />;
+    if (!isLoaded) return <div className="flex justify-center items-center h-screen"><ProgressSpinner /></div>;
 
     const riders = data?.getActiveRiders || [];
 
