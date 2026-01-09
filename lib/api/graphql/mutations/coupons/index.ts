@@ -7,7 +7,9 @@ export const CREATE_COUPON = gql`
       title
       code
       discount
+      discount
       enabled
+      minOrderAmount
     }
   }
 `;
@@ -18,7 +20,9 @@ export const EDIT_COUPON = gql`
       title
       code
       discount
+      discount
       enabled
+      minOrderAmount
     }
   }
 `;

@@ -7,13 +7,14 @@ export interface ICoupon {
   enabled: boolean;
   title: string;
   code: string | null;
+  minOrderAmount: number;
   __typename: string;
   _id: string;
 }
 export interface IGetCouponsData {
   coupons: ICoupon[];
 }
-export interface IGetCouponsVariables {}
+export interface IGetCouponsVariables { }
 
 export interface ICouponsStakProps {
   coupon: ICoupon;

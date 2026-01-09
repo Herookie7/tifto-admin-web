@@ -46,6 +46,7 @@ export default function CouponForm({
     title: isEditing.bool ? isEditing?.data?.title : '',
     code: isEditing.bool ? isEditing?.data?.code || '' : '',
     discount: isEditing.bool ? isEditing?.data?.discount : 0,
+    minOrderAmount: isEditing.bool ? isEditing?.data?.minOrderAmount || 0 : 0,
     enabled: isEditing.bool ? isEditing?.data?.enabled : true,
   };
 
@@ -63,14 +64,15 @@ export default function CouponForm({
         });
         setIsEditing({
           bool: false,
-            data: {
-              __typename: '',
-              _id: '',
-              discount: 0,
-              enabled: false,
-              title: '',
-              code: '',
-            },
+          data: {
+            __typename: '',
+            _id: '',
+            discount: 0,
+            minOrderAmount: 0,
+            enabled: false,
+            title: '',
+            code: '',
+          },
         });
       },
       onError: (err) => {
@@ -84,14 +86,15 @@ export default function CouponForm({
         });
         setIsEditing({
           bool: false,
-            data: {
-              __typename: '',
-              _id: '',
-              discount: 0,
-              enabled: false,
-              title: '',
-              code: '',
-            },
+          data: {
+            __typename: '',
+            _id: '',
+            discount: 0,
+            minOrderAmount: 0,
+            enabled: false,
+            title: '',
+            code: '',
+          },
         });
       },
     }
@@ -109,14 +112,15 @@ export default function CouponForm({
         });
         setIsEditing({
           bool: false,
-            data: {
-              __typename: '',
-              _id: '',
-              discount: 0,
-              enabled: false,
-              title: '',
-              code: '',
-            },
+          data: {
+            __typename: '',
+            _id: '',
+            discount: 0,
+            minOrderAmount: 0,
+            enabled: false,
+            title: '',
+            code: '',
+          },
         });
       },
       onError: (err) => {
@@ -130,14 +134,15 @@ export default function CouponForm({
         });
         setIsEditing({
           bool: false,
-            data: {
-              __typename: '',
-              _id: '',
-              discount: 0,
-              enabled: false,
-              title: '',
-              code: '',
-            },
+          data: {
+            __typename: '',
+            _id: '',
+            discount: 0,
+            minOrderAmount: 0,
+            enabled: false,
+            title: '',
+            code: '',
+          },
         });
       },
     }
@@ -163,6 +168,7 @@ export default function CouponForm({
               title: values.title,
               code: values.code,
               discount: values.discount,
+              minOrderAmount: values.minOrderAmount,
               enabled: values.enabled,
             };
           } else {
@@ -171,6 +177,7 @@ export default function CouponForm({
               title: values.title,
               code: values.code,
               discount: values.discount,
+              minOrderAmount: values.minOrderAmount,
               enabled: values.enabled,
             };
           }
@@ -194,6 +201,7 @@ export default function CouponForm({
               __typename: '',
               _id: '',
               discount: 0,
+              minOrderAmount: 0,
               enabled: true,
               title: '',
               code: '',
@@ -275,6 +283,26 @@ export default function CouponForm({
                     borderColor: onErrorMessageMatcher(
                       'discount',
                       errors?.discount,
+                      CouponErrors
+                    )
+                      ? 'red'
+                      : '',
+                  }}
+                />
+
+                <CustomNumberField
+                  value={values.minOrderAmount}
+                  name="minOrderAmount"
+                  minFractionDigits={0}
+                  maxFractionDigits={2}
+                  showLabel={true}
+                  placeholder={t('Minimum Order Amount')}
+                  onChange={setFieldValue}
+                  min={0}
+                  style={{
+                    borderColor: onErrorMessageMatcher(
+                      'minOrderAmount',
+                      errors?.minOrderAmount,
                       CouponErrors
                     )
                       ? 'red'
