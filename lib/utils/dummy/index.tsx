@@ -365,6 +365,7 @@ export const generateDummyCoupons = (count: number = 10) => {
       __typename: `coupon_${i + 1}`,
       discount: Math.floor(Math.random() * i + 15),
       enabled: Math.random() * 3 > 2,
+      minOrderAmount: 0,
     });
   }
   return coupons;

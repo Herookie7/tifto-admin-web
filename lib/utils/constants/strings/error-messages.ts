@@ -208,6 +208,7 @@ export const CouponErrors: ICouponErrors = {
     'You cannot exceed from 100 as this is a %age field',
   ],
   enabled: ['Required', 'Please choose one'],
+  minOrderAmount: ['Required', 'Minimum value must be greater than 0'],
 };
 
 

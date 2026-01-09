@@ -19,6 +19,7 @@ export default function CouponsScreen() {
       enabled: false,
       title: '',
       code: '',
+      minOrderAmount: 0,
     },
   });
 

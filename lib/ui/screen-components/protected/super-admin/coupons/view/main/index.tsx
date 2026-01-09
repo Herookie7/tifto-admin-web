@@ -58,6 +58,7 @@ export default function CouponsMain({
       enabled: false,
       title: '',
       code: '',
+      minOrderAmount: 0,
     },
   });
   const [globalFilterValue, setGlobalFilterValue] = useState('');
@@ -128,6 +129,7 @@ export default function CouponsMain({
         enabled: false,
         title: '',
         code: '',
+        minOrderAmount: 0,
       },
     });
   }
@@ -225,6 +227,7 @@ export default function CouponsMain({
               enabled: false,
               title: '',
               code: '',
+              minOrderAmount: 0,
             },
           })
         }
