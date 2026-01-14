@@ -33,3 +33,11 @@ export const RESET_USER_SESSION = gql`
     }
   }
 `;
+
+export const RESET_PASSWORD = gql`
+  mutation resetPassword($password: String!, $email: String!) {
+    resetPassword(password: $password, email: $email) {
+      result
+    }
+  }
+`;

@@ -21,6 +21,7 @@ import {
   faEdit,
   faEllipsisVertical,
   faEye,
+  faKey,
   faShop,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
@@ -33,6 +34,7 @@ import Image from 'next/image';
 import CustomDialog from '../delete-dialog';
 import CustomPopupMenu from '../popup-menu';
 import TextComponent from '../text-field';
+import { ResetPasswordDialog } from '../reset-password-dialog';
 
 // Contexts
 import { ToastContext } from '@/lib/context/global/toast.context';
@@ -64,6 +66,7 @@ export default function VendorCard({
   // States
   const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
   const [isDeletePopupOpen, setDeletePopupOpen] = useState<boolean>(false);
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -142,6 +145,11 @@ export default function VendorCard({
     router.push('/admin/vendor/dashboard');
   };
 
+  const onHandlerResetPassword = () => {
+    setShowResetPasswordDialog(true);
+    setPopupOpen(false);
+  };
+
   return (
     <div
       onClick={(e: React.MouseEvent<HTMLDivElement>) => {
@@ -200,9 +208,8 @@ export default function VendorCard({
           {vendorId === _id && (
             <FontAwesomeIcon
               icon={faEllipsisVertical}
-              className={`p-1 ${
-                isPopupOpen ? 'text-gray-400' : 'text-white'
-              } cursor-pointer hover:scale-105`}
+              className={`p-1 ${isPopupOpen ? 'text-gray-400' : 'text-white'
+                } cursor-pointer hover:scale-105`}
               onClick={(e) => {
                 e.stopPropagation();
                 setPopupOpen(!isPopupOpen);
@@ -231,6 +238,13 @@ export default function VendorCard({
                     color: 'text-gray-600',
                   },
                   {
+                    title: t('Reset Password'),
+                    icon: faKey,
+                    fn: onHandlerResetPassword,
+                    data: vendorId,
+                    color: 'text-orange-500',
+                  },
+                  {
                     title: t('Delete'),
                     icon: faTrash,
                     fn: onHandlerDelete,
@@ -249,6 +263,13 @@ export default function VendorCard({
         visible={isDeletePopupOpen}
         onHide={onHandleHideDeleteVendor}
         onConfirm={onHandleConfirmDeleteVendor}
+      />
+
+      <ResetPasswordDialog
+        visible={showResetPasswordDialog}
+        onHide={() => setShowResetPasswordDialog(false)}
+        userEmail={email}
+        userName={name || 'Vendor'}
       />
     </div>
   );
