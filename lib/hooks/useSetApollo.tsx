@@ -136,6 +136,12 @@ export const useSetupApollo = (): ApolloClient<NormalizedCacheObject> => {
           let handle: Subscription | undefined;
           getAuthorizationToken()
             .then((token) => {
+              console.log('🔐 Apollo authLink:', {
+                operation: operation.operationName,
+                hasToken: !!token,
+                tokenPreview: token ? `${token.substring(0, 20)}...` : null
+              });
+
               operation.setContext(({ headers = {} }) => ({
                 headers: {
                   ...headers,
