@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { IGlobalComponentProps } from './global.interface';
 
 export interface IGoogleMapsLoaderComponentProps
-  extends IGlobalComponentProps {}
+  extends IGlobalComponentProps { }
 
 export interface IAutoCompleteItem {
   code: string;
@@ -72,6 +72,10 @@ export interface IUpdateRestaurantDeliveryZoneVariables {
   boundType: string;
   bounds: number[][][];
   circleBounds?: {
+    center: {
+      latitude: number;
+      longitude: number;
+    };
     radius: number;
   };
   location: {
