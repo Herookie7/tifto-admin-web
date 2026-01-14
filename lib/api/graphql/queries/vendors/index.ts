@@ -28,29 +28,30 @@ export const GET_VENDORS_L = gql`
 
 export const GET_VENDOR_BY_ID = gql`
   query GetVendor($id: String!) {
-    getVendor(id: $id) {
+    getVendor(vendorId: $id) {
       _id
       email
       userType
       name
-      plainPassword
+      phone
       image
-      firstName
-      lastName
-      phoneNumber
+      role
+      isActive
     }
   }
 `;
 
 export const GET_VENDOR_BY_ID_WITH_RESTAURANTS = gql`
   query GetVendor($id: String!) {
-    getVendor(id: $id) {
+    getVendor(vendorId: $id) {
       _id
       email
       userType
       name
-      plainPassword
+      phone
       image
+      role
+      isActive
       restaurants {
         _id
         orderId
