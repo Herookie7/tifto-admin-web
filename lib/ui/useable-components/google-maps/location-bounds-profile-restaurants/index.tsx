@@ -69,7 +69,7 @@ const autocompleteService: {
 
 const CustomGoogleMapsLocationBounds: React.FC<
   ICustomGoogleMapsLocationBoundsComponentProps
-> = ({ onStepChange, hideControls, height }) =>   {
+> = ({ onStepChange, hideControls, height }) => {
   // Context
   const { restaurantLayoutContextData } = useContext(RestaurantLayoutContext);
   const { restaurantId } = restaurantLayoutContextData;
@@ -106,7 +106,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
   const listenersRef = useRef<google.maps.MapsEventListener[]>([]);
 
   // API
-  const { loading: isFetchingRestaurantProfile, error: profileError } = useQuery(
+  const { loading: isFetchingRestaurantProfile } = useQuery(
     GET_RESTAURANT_PROFILE,
     {
       variables: { id: restaurantId ?? '' },
@@ -117,7 +117,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
       onError: onErrorFetchRestaurantProfile,
     }
   );
-  const { loading: isFetchingRestaurantDeliveryZoneInfo, error: zoneInfoError } = useQuery(
+  const { loading: isFetchingRestaurantDeliveryZoneInfo } = useQuery(
     GET_RESTAURANT_DELIVERY_ZONE_INFO,
     {
       variables: { restaurantId: restaurantId ?? '' },
@@ -135,13 +135,13 @@ const CustomGoogleMapsLocationBounds: React.FC<
         if (data) {
           updateCache(cache, { data } as IRestaurantProfileResponse);
         }
-      },  
+      },
 
       onCompleted: onRestaurantZoneUpdateCompleted,
       onError: onErrorLocationZoneUpdate,
     }
   );
-  const { error: zonesError } = useQuery<IZonesResponse>(GET_ZONES, {
+  useQuery<IZonesResponse>(GET_ZONES, {
     errorPolicy: 'all', // Return partial data even if there are errors
     onCompleted: (data) => {
       if (data) {
@@ -152,7 +152,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
       console.error('Error fetching zones:', error);
     },
   });
-  
+
 
   // Memos
   const radiusInMeter = useMemo(() => {
@@ -389,7 +389,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
         const lng =
           center.lng +
           (radius / (111300 * Math.cos(center.lat * (Math.PI / 180)))) *
-            Math.sin(angle);
+          Math.sin(angle);
         path.push({ lat, lng });
       }
 
@@ -412,7 +412,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
         const lng =
           center.lng +
           (radius / (111320 * Math.cos((center.lat * Math.PI) / 180))) *
-            Math.sin(angle);
+          Math.sin(angle);
         path.push([lng, lat]);
       }
 
@@ -521,7 +521,11 @@ const CustomGoogleMapsLocationBounds: React.FC<
         ...variables,
         bounds,
         circleBounds: {
-          radius: distance, // Convert kilometers to meters
+          center: {
+            latitude: center.lat,
+            longitude: center.lng,
+          },
+          radius: distance,
         },
       };
 
@@ -720,7 +724,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
                   />
                 )
             )}
-            
+
             {/* Delivery zone boundary. */}
             <Polygon
               editable={!hideControls}
