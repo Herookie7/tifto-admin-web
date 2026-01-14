@@ -54,7 +54,6 @@ export default function VendorCard({
 }: IVendorCardProps) {
   // Hooks
   const t = useTranslations();
-  console.log("isLast...", isLast)
 
   // Context
   const { vendorId, onSetVendorId, vendorResponse, onResetVendor } =

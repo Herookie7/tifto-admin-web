@@ -5,12 +5,11 @@ export const CREATE_VENDOR = gql`
     createVendor(vendorInput: $vendorInput) {
       _id
       email
-      password
       name
       image
-      firstName
-      lastName
-      phoneNumber
+      phone
+      role
+      isActive
     }
   }
 `;
@@ -20,12 +19,11 @@ export const EDIT_VENDOR = gql`
     editVendor(vendorInput: $vendorInput) {
       _id
       email
-      password
       name
       image
-      firstName
-      lastName
-      phoneNumber
+      phone
+      role
+      isActive
     }
   }
 `;
