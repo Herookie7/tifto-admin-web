@@ -390,7 +390,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
         const lng =
           center.lng +
           (radius / (111300 * Math.cos(center.lat * (Math.PI / 180)))) *
-            Math.sin(angle);
+          Math.sin(angle);
         path.push({ lat, lng });
       }
 
@@ -413,7 +413,7 @@ const CustomGoogleMapsLocationBounds: React.FC<
         const lng =
           center.lng +
           (radius / (111320 * Math.cos((center.lat * Math.PI) / 180))) *
-            Math.sin(angle);
+          Math.sin(angle);
         path.push([lng, lat]);
       }
 
@@ -539,7 +539,11 @@ const CustomGoogleMapsLocationBounds: React.FC<
         ...variables,
         bounds,
         circleBounds: {
-          radius: distance, // Convert kilometers to meters
+          center: {
+            latitude: center.lat,
+            longitude: center.lng,
+          },
+          radius: distance,
         },
       };
 
