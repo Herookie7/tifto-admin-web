@@ -12,8 +12,8 @@ export const EARNING_COLUMNS = ({
 }) => {
   // Hooks
   const t = useTranslations();
-  const { CURRENCY_CODE, CURRENT_SYMBOL } = useConfiguration();
-  const currencySymbol = CURRENT_SYMBOL || '₹';
+  const { CURRENCY_CODE } = useConfiguration();
+  // const currencySymbol = CURRENT_SYMBOL || '₹';
   const currencyCode = CURRENCY_CODE || 'INR';
 
   console.log({ isSuperAdmin });

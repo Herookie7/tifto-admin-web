@@ -16,7 +16,6 @@ export default function CustomCommissionTextField({
 }: ICustomNumberTippingProps) {
   const MIN_VALUE = 0;
   const MAX_VALUE = commissionType === 'percentage' ? (max || 100) : undefined;
-  const isPercentage = commissionType === 'percentage';
 
   const handleChange = (newValue: string) => {
     if (onChange) {
